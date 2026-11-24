@@ -3,217 +3,424 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0f0f12">
-<title>FreeTime — Watch, Share, Connect</title>
+<meta name="theme-color" content="#0a0a0f">
+<title>FreeTime — Share Your Moments</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  /* ============ RESET / THEME ============ */
+  /* ============ RESET & THEME ============ */
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   :root{
-    --bg:#0f0f12; --surface:#181b22; --surface-2:#1f242e; --border:#2a2f3a;
-    --text:#eaeef2; --muted:#8b95a5; --accent:#ff3b5c; --accent-2:#3b82f6;
-    --radius:16px; --nav-h:64px;
-    --safe-b: env(safe-area-inset-bottom, 0px);
-    --safe-t: env(safe-area-inset-top, 0px);
+    --bg:#0a0a0f;
+    --bg-2:#12121a;
+    --glass:rgba(255,255,255,.04);
+    --glass-2:rgba(255,255,255,.07);
+    --border:rgba(255,255,255,.09);
+    --border-2:rgba(255,255,255,.15);
+    --text:#f5f5f7;
+    --text-2:#b8bcc7;
+    --text-3:#7a8090;
+    --coral:#ff6b6b;
+    --coral-2:#ff8e53;
+    --teal:#4ecdc4;
+    --teal-2:#44a08d;
+    --purple:#a78bfa;
+    --radius:20px;
+    --radius-sm:14px;
+    --nav-h:68px;
+    --safe-b:env(safe-area-inset-bottom,0px);
+    --safe-t:env(safe-area-inset-top,0px);
+    --grain:radial-gradient(circle at 20% 30%, rgba(255,107,107,.06), transparent 40%),
+            radial-gradient(circle at 80% 70%, rgba(78,205,196,.06), transparent 45%);
   }
   html,body{height:100%}
   body{
-    background:var(--bg); color:var(--text);
-    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Inter,sans-serif;
-    min-height:100vh; display:flex; flex-direction:column;
-    -webkit-font-smoothing:antialiased; overscroll-behavior-y:none;
+    background:var(--bg);
+    background-image:var(--grain);
+    background-attachment:fixed;
+    color:var(--text);
+    font-family:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    min-height:100vh;display:flex;flex-direction:column;
+    -webkit-font-smoothing:antialiased;
+    overscroll-behavior-y:none;
+    letter-spacing:-.01em;
   }
   a{color:inherit;text-decoration:none}
   button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
   input,textarea{font:inherit;color:inherit}
   img,video{display:block;max-width:100%}
   .hidden{display:none!important}
-  .muted{color:var(--muted)}
+  .muted{color:var(--text-3)}
 
   /* ============ TOP NAV ============ */
   .topnav{
-    height:var(--nav-h); padding:0 .75rem;
+    height:var(--nav-h);
+    padding:0 1rem;
     padding-top:var(--safe-t);
-    display:flex; align-items:center; gap:.6rem;
-    background:var(--surface); border-bottom:1px solid var(--border);
-    position:sticky; top:0; z-index:50;
+    display:flex;align-items:center;gap:.75rem;
+    background:rgba(10,10,15,.72);
+    backdrop-filter:blur(20px) saturate(180%);
+    -webkit-backdrop-filter:blur(20px) saturate(180%);
+    border-bottom:1px solid var(--border);
+    position:sticky;top:0;z-index:50;
   }
-  .brand{display:flex;align-items:center;gap:.5rem;font-weight:800;font-size:1.25rem;color:#fff;flex-shrink:0;letter-spacing:-.02em}
-  .brand .logo{
-    width:34px;height:34px;border-radius:10px;
-    background:linear-gradient(135deg,#ff3b5c,#ff7a00);
-    display:flex;align-items:center;justify-content:center;font-size:1rem;color:#fff;
+  .brand{display:flex;align-items:center;gap:.55rem;font-weight:800;font-size:1.2rem;letter-spacing:-.03em;flex-shrink:0}
+  .brand .mark{
+    width:36px;height:36px;border-radius:12px;
+    background:conic-gradient(from 210deg,var(--coral),var(--coral-2),var(--purple),var(--teal),var(--coral));
+    display:flex;align-items:center;justify-content:center;
+    font-size:.95rem;color:#fff;
+    box-shadow:0 6px 20px -4px rgba(255,107,107,.5);
   }
-  .brand .logo-text span{color:var(--accent)}
+  .brand .name{background:linear-gradient(135deg,#fff,#b8bcc7);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .brand .name b{background:linear-gradient(135deg,var(--coral),var(--coral-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+
   .search-wrap{
-    flex:1; max-width:640px; margin:0 auto;
-    display:flex; align-items:center;
-    background:var(--surface-2); border:1px solid var(--border);
-    border-radius:40px; overflow:hidden; transition:border-color .15s;
+    flex:1;max-width:560px;margin:0 auto;
+    display:flex;align-items:center;
+    background:var(--glass);
+    border:1px solid var(--border);
+    border-radius:40px;overflow:hidden;
+    transition:.2s;
   }
-  .search-wrap:focus-within{border-color:var(--accent-2)}
-  .search-wrap input{flex:1;min-width:0;padding:.6rem .9rem;background:transparent;border:none;outline:none;font-size:.95rem}
-  .search-wrap button{padding:.6rem 1rem;background:var(--surface);color:var(--muted);border-left:1px solid var(--border)}
-  .search-wrap button:hover{color:#fff}
+  .search-wrap:focus-within{border-color:var(--teal);background:var(--glass-2);box-shadow:0 0 0 4px rgba(78,205,196,.1)}
+  .search-wrap input{flex:1;min-width:0;padding:.65rem 1rem;background:transparent;border:none;outline:none;font-size:.92rem}
+  .search-wrap input::placeholder{color:var(--text-3)}
+  .search-wrap button{padding:.65rem 1.1rem;color:var(--text-3);transition:.15s}
+  .search-wrap button:hover{color:var(--teal)}
+
   .nav-actions{display:flex;align-items:center;gap:.4rem;flex-shrink:0}
-  .btn{display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border-radius:40px;font-weight:600;font-size:.88rem;transition:.15s ease}
-  .btn-primary{background:var(--accent);color:#fff}
-  .btn-primary:hover{background:#e63351}
-  .btn-outline{border:1.5px solid var(--border);background:var(--surface-2)}
-  .btn-outline:hover{border-color:var(--muted)}
-  .btn-ghost{color:var(--muted)}
-  .btn-ghost:hover{color:#fff;background:var(--surface-2)}
+  .pill-btn{
+    display:inline-flex;align-items:center;gap:.4rem;
+    padding:.55rem 1.1rem;border-radius:40px;
+    font-weight:600;font-size:.85rem;
+    transition:.18s ease;
+  }
+  .pill-primary{
+    background:linear-gradient(135deg,var(--coral),var(--coral-2));
+    color:#fff;
+    box-shadow:0 6px 20px -6px rgba(255,107,107,.6);
+  }
+  .pill-primary:hover{transform:translateY(-1px);box-shadow:0 10px 24px -6px rgba(255,107,107,.7)}
+  .pill-glass{background:var(--glass);border:1px solid var(--border);color:var(--text-2)}
+  .pill-glass:hover{background:var(--glass-2);color:#fff;border-color:var(--border-2)}
+  .pill-icon{width:38px;height:38px;padding:0;border-radius:50%;background:var(--glass);border:1px solid var(--border);color:var(--text-2);display:flex;align-items:center;justify-content:center}
+  .pill-icon:hover{color:#fff;background:var(--glass-2)}
+
   .avatar{
-    width:36px;height:36px;border-radius:50%;
-    background:linear-gradient(135deg,#2563eb,#7c3aed);
+    width:38px;height:38px;border-radius:50%;
+    background:linear-gradient(135deg,var(--teal),var(--purple));
     display:flex;align-items:center;justify-content:center;
     font-weight:700;color:#fff;font-size:.9rem;cursor:pointer;flex-shrink:0;overflow:hidden;
+    border:2px solid rgba(255,255,255,.15);
   }
   .avatar img{width:100%;height:100%;object-fit:cover}
 
   /* ============ SHELL ============ */
   .shell{display:flex;flex:1;min-height:0}
 
-  /* ============ SIDEBAR (desktop only) ============ */
+  /* ============ SIDEBAR (desktop) ============ */
   .sidebar{
-    width:220px; flex-shrink:0; padding:1rem .75rem;
-    border-right:1px solid var(--border); background:var(--surface);
-    display:flex; flex-direction:column; gap:.15rem;
-    position:sticky; top:var(--nav-h); height:calc(100vh - var(--nav-h));
+    width:230px;flex-shrink:0;padding:1.25rem .85rem;
+    background:rgba(10,10,15,.4);
+    backdrop-filter:blur(10px);
+    border-right:1px solid var(--border);
+    display:flex;flex-direction:column;gap:.2rem;
+    position:sticky;top:var(--nav-h);height:calc(100vh - var(--nav-h));
     overflow-y:auto;
   }
+  .side-label{font-size:.68rem;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.1em;padding:.75rem .85rem .35rem}
   .side-item{
     display:flex;align-items:center;gap:.85rem;
-    padding:.6rem .85rem;border-radius:10px;
-    color:var(--muted);font-size:.9rem;font-weight:500;cursor:pointer;transition:.12s;
+    padding:.65rem .85rem;border-radius:12px;
+    color:var(--text-2);font-size:.9rem;font-weight:500;cursor:pointer;transition:.15s;
+    position:relative;
   }
-  .side-item i{width:18px;text-align:center}
-  .side-item:hover{background:var(--surface-2);color:#fff}
-  .side-item.active{background:var(--surface-2);color:#fff;border-left:3px solid var(--accent)}
-  .side-divider{height:1px;background:var(--border);margin:.5rem .4rem}
+  .side-item i{width:18px;text-align:center;font-size:.95rem}
+  .side-item:hover{background:var(--glass);color:#fff}
+  .side-item.active{background:linear-gradient(135deg,rgba(255,107,107,.15),rgba(78,205,196,.1));color:#fff}
+  .side-item.active::before{
+    content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);
+    width:3px;height:60%;border-radius:2px;
+    background:linear-gradient(180deg,var(--coral),var(--teal));
+  }
+  .side-divider{height:1px;background:var(--border);margin:.6rem .5rem}
 
-  .main{flex:1;min-width:0;padding:1.25rem 1.5rem 4rem;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .main{flex:1;min-width:0;padding:1.5rem 1.75rem 5rem;overflow-y:auto;-webkit-overflow-scrolling:touch}
 
-  /* ============ AUTH SCREEN ============ */
-  .auth-screen{min-height:calc(100vh - var(--nav-h));display:flex;align-items:center;justify-content:center;padding:1.5rem 1rem}
+  /* ============ AUTH ============ */
+  .auth-screen{min-height:calc(100vh - var(--nav-h));display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
   .auth-card{
-    width:100%;max-width:420px;background:var(--surface);
-    border:1px solid var(--border);border-radius:22px;padding:1.75rem;
-    box-shadow:0 30px 60px -20px rgba(0,0,0,.7);
+    width:100%;max-width:440px;
+    background:var(--glass);
+    backdrop-filter:blur(20px);
+    border:1px solid var(--border);
+    border-radius:28px;
+    padding:2.25rem 1.75rem;
+    box-shadow:0 40px 80px -30px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.03);
+    position:relative;overflow:hidden;
   }
-  .auth-tabs{display:flex;gap:.2rem;margin-bottom:1.5rem;background:var(--surface-2);padding:.3rem;border-radius:40px}
-  .auth-tab{flex:1;padding:.6rem;border-radius:40px;color:var(--muted);font-weight:600;font-size:.9rem;transition:.15s}
-  .auth-tab.active{background:var(--accent);color:#fff}
-  .field{display:flex;flex-direction:column;gap:.35rem;margin-bottom:.85rem}
-  .field label{font-size:.8rem;color:var(--muted);font-weight:500}
+  .auth-card::before{
+    content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
+    background:radial-gradient(circle at 30% 20%,rgba(255,107,107,.12),transparent 40%),
+               radial-gradient(circle at 70% 80%,rgba(78,205,196,.12),transparent 45%);
+    pointer-events:none;
+  }
+  .auth-card > *{position:relative;z-index:1}
+  .auth-title{font-size:1.7rem;font-weight:800;letter-spacing:-.03em;margin-bottom:.35rem;text-align:center}
+  .auth-title span{background:linear-gradient(135deg,var(--coral),var(--teal));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .auth-sub{color:var(--text-3);font-size:.88rem;text-align:center;margin-bottom:1.75rem}
+
+  .auth-tabs{
+    display:flex;gap:.2rem;margin-bottom:1.5rem;
+    background:var(--glass);border:1px solid var(--border);
+    padding:.3rem;border-radius:40px;
+  }
+  .auth-tab{
+    flex:1;padding:.65rem;border-radius:40px;
+    color:var(--text-3);font-weight:600;font-size:.88rem;transition:.2s;
+  }
+  .auth-tab.active{
+    background:linear-gradient(135deg,var(--coral),var(--coral-2));
+    color:#fff;
+    box-shadow:0 6px 16px -4px rgba(255,107,107,.5);
+  }
+
+  .field{display:flex;flex-direction:column;gap:.4rem;margin-bottom:1rem}
+  .field label{font-size:.78rem;color:var(--text-2);font-weight:600;letter-spacing:.02em}
   .field input,.field textarea{
-    background:var(--bg);border:1px solid var(--border);border-radius:12px;
-    padding:.75rem .9rem;outline:none;transition:.15s;font-size:.95rem;width:100%;
+    background:rgba(0,0,0,.3);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:.8rem 1rem;
+    outline:none;
+    transition:.18s;
+    font-size:.95rem;width:100%;
   }
-  .field input:focus,.field textarea:focus{border-color:var(--accent-2);box-shadow:0 0 0 3px rgba(59,130,246,.15)}
-  .auth-submit{width:100%;padding:.85rem;background:var(--accent);color:#fff;border-radius:40px;font-weight:700;font-size:1rem;margin-top:.5rem;transition:.15s}
-  .auth-submit:hover{background:#e63351}
-  .auth-msg{margin-top:.9rem;font-size:.86rem;text-align:center;min-height:1.2em}
-  .auth-msg.error{color:#ff6b81}
-  .auth-msg.ok{color:#4ade80}
+  .field input:focus,.field textarea:focus{
+    border-color:var(--teal);
+    box-shadow:0 0 0 4px rgba(78,205,196,.12);
+    background:rgba(0,0,0,.4);
+  }
+  .field input::placeholder,.field textarea::placeholder{color:var(--text-3)}
+  .auth-submit{
+    width:100%;padding:.9rem;
+    background:linear-gradient(135deg,var(--coral),var(--coral-2));
+    color:#fff;border-radius:40px;font-weight:700;font-size:.95rem;
+    margin-top:.5rem;transition:.2s;
+    box-shadow:0 10px 24px -8px rgba(255,107,107,.6);
+  }
+  .auth-submit:hover{transform:translateY(-1px);box-shadow:0 14px 28px -8px rgba(255,107,107,.7)}
+  .auth-submit:disabled{opacity:.6;transform:none;cursor:not-allowed}
+  .auth-msg{margin-top:1rem;font-size:.85rem;text-align:center;min-height:1.2em;line-height:1.4}
+  .auth-msg.error{color:#ff8e9e}
+  .auth-msg.ok{color:var(--teal)}
 
   /* ============ PROFILE ============ */
-  .profile-banner{height:110px;border-radius:18px;background:linear-gradient(120deg,#1e3a8a,#7c3aed,#db2777);position:relative;margin-bottom:-36px}
-  .profile-head{display:flex;align-items:flex-end;gap:1.2rem;padding:0 1rem;position:relative;z-index:2;flex-wrap:wrap}
+  .profile-hero{
+    position:relative;
+    border-radius:28px;
+    overflow:hidden;
+    margin-bottom:1.5rem;
+    background:var(--glass);
+    border:1px solid var(--border);
+    backdrop-filter:blur(20px);
+  }
+  .profile-banner{
+    height:130px;
+    background:
+      radial-gradient(circle at 20% 50%,rgba(255,107,107,.5),transparent 50%),
+      radial-gradient(circle at 80% 50%,rgba(78,205,196,.5),transparent 50%),
+      radial-gradient(circle at 50% 100%,rgba(167,139,250,.4),transparent 60%),
+      linear-gradient(135deg,#1a1a24,#0f0f18);
+    position:relative;
+  }
+  .profile-banner::after{
+    content:'';position:absolute;inset:0;
+    background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,.06) 1px,transparent 0);
+    background-size:20px 20px;opacity:.6;
+  }
+  .profile-head{
+    display:flex;align-items:flex-end;gap:1.25rem;
+    padding:0 1.5rem 1.25rem;
+    margin-top:-44px;position:relative;z-index:2;
+    flex-wrap:wrap;
+  }
   .avatar-xl{
-    width:100px;height:100px;border-radius:50%;
-    background:linear-gradient(135deg,#2563eb,#7c3aed);
+    width:104px;height:104px;border-radius:50%;
+    background:linear-gradient(135deg,var(--teal),var(--purple),var(--coral));
     display:flex;align-items:center;justify-content:center;
-    font-size:2.2rem;font-weight:800;color:#fff;
-    border:5px solid var(--bg);overflow:hidden;
+    font-size:2.3rem;font-weight:800;color:#fff;
+    border:5px solid var(--bg);
+    box-shadow:0 12px 30px -10px rgba(0,0,0,.7);
+    overflow:hidden;flex-shrink:0;
   }
   .avatar-xl img{width:100%;height:100%;object-fit:cover}
-  .profile-meta{padding-bottom:.4rem;min-width:0}
-  .profile-meta h1{font-size:1.5rem;letter-spacing:-.02em;margin-bottom:.15rem;word-break:break-word}
-  .profile-meta .username{color:var(--muted);font-size:.9rem;margin-bottom:.4rem}
-  .stats{display:flex;gap:1.2rem;color:var(--muted);font-size:.85rem;flex-wrap:wrap}
-  .stats b{color:#fff;font-weight:700}
+  .profile-meta{padding-bottom:.3rem;min-width:0;flex:1}
+  .profile-meta h1{font-size:1.6rem;letter-spacing:-.03em;margin-bottom:.15rem;word-break:break-word;font-weight:800}
+  .profile-meta .handle{color:var(--teal);font-size:.88rem;margin-bottom:.6rem;font-weight:500}
+  .stats{display:flex;gap:1.5rem;color:var(--text-3);font-size:.85rem;flex-wrap:wrap}
+  .stats b{color:#fff;font-weight:700;margin-right:.15rem}
 
   /* ============ UPLOAD PANEL ============ */
-  .panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.1rem 1.2rem;margin-top:1.25rem}
-  .panel h2{font-size:1rem;margin-bottom:.85rem;display:flex;align-items:center;gap:.5rem}
-  .panel h2 i{color:var(--accent)}
-  .upload-row{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+  .panel{
+    background:var(--glass);
+    backdrop-filter:blur(20px);
+    border:1px solid var(--border);
+    border-radius:24px;
+    padding:1.35rem 1.4rem;
+    margin-bottom:1.5rem;
+  }
+  .panel h2{font-size:1rem;margin-bottom:1rem;display:flex;align-items:center;gap:.55rem;font-weight:700}
+  .panel h2 .icon-wrap{
+    width:32px;height:32px;border-radius:10px;
+    background:linear-gradient(135deg,rgba(255,107,107,.2),rgba(78,205,196,.15));
+    display:flex;align-items:center;justify-content:center;
+    color:var(--coral);font-size:.9rem;
+  }
+  .upload-row{display:flex;flex-wrap:wrap;gap:.65rem;align-items:center;margin-top:.5rem}
   .file-btn{
-    display:inline-flex;align-items:center;gap:.5rem;padding:.55rem .9rem;border-radius:40px;
-    background:var(--surface-2);border:1px dashed var(--border);font-size:.85rem;font-weight:600;cursor:pointer;
+    display:inline-flex;align-items:center;gap:.55rem;
+    padding:.6rem 1rem;border-radius:40px;
+    background:var(--glass-2);
+    border:1.5px dashed var(--border-2);
+    font-size:.85rem;font-weight:600;cursor:pointer;transition:.15s;
   }
-  .file-btn:hover{border-color:var(--accent)}
-  .file-name{font-size:.82rem;color:var(--muted);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .file-btn:hover{border-color:var(--teal);color:var(--teal);background:rgba(78,205,196,.06)}
+  .file-name{font-size:.8rem;color:var(--text-3);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+  .btn-upload{
+    padding:.6rem 1.2rem;border-radius:40px;
+    background:linear-gradient(135deg,var(--teal),var(--teal-2));
+    color:#fff;font-weight:700;font-size:.85rem;
+    transition:.18s;
+    box-shadow:0 8px 20px -6px rgba(78,205,196,.5);
+  }
+  .btn-upload:hover{transform:translateY(-1px);box-shadow:0 12px 24px -6px rgba(78,205,196,.6)}
+  .btn-upload:disabled{opacity:.6;transform:none;cursor:not-allowed}
 
-  /* ============ VIDEO GRID ============ */
-  .grid-title{display:flex;align-items:center;justify-content:space-between;margin:1.5rem 0 .85rem;gap:.5rem}
-  .grid-title h2{font-size:1.15rem}
-  .video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.1rem}
+  /* ============ GRID ============ */
+  .grid-title{display:flex;align-items:center;justify-content:space-between;margin:1.75rem 0 1rem;gap:.5rem;flex-wrap:wrap}
+  .grid-title h2{font-size:1.2rem;font-weight:800;letter-spacing:-.02em}
+  .grid-title .count{font-size:.8rem;color:var(--text-3);background:var(--glass);padding:.3rem .75rem;border-radius:30px;border:1px solid var(--border)}
+
+  .video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:1.2rem}
   .video-card{
-    background:var(--surface);border-radius:var(--radius);overflow:hidden;
-    border:1px solid var(--border);transition:.18s ease;cursor:pointer;display:flex;flex-direction:column;
+    background:var(--glass);
+    backdrop-filter:blur(10px);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    overflow:hidden;
+    transition:.2s ease;
+    cursor:pointer;
+    display:flex;flex-direction:column;
   }
-  .video-card:hover{transform:translateY(-3px);border-color:#3b4a5e;box-shadow:0 18px 30px -14px #000}
-  .thumb{aspect-ratio:16/9;background:#0c0e12;display:flex;align-items:center;justify-content:center;position:relative;color:#4b5a6e;font-size:2rem;overflow:hidden}
+  .video-card:hover{
+    transform:translateY(-4px);
+    border-color:var(--border-2);
+    box-shadow:0 24px 40px -20px rgba(0,0,0,.8),0 0 0 1px rgba(78,205,196,.15);
+  }
+  .thumb{
+    aspect-ratio:16/9;background:#000;
+    display:flex;align-items:center;justify-content:center;
+    position:relative;color:var(--text-3);font-size:2rem;
+    overflow:hidden;
+  }
   .thumb img,.thumb video{width:100%;height:100%;object-fit:cover}
   .thumb .play-overlay{
-    position:absolute;inset:0;background:rgba(0,0,0,.35);
-    display:flex;align-items:center;justify-content:center;opacity:0;transition:.15s;
+    position:absolute;inset:0;
+    background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,.6));
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;transition:.2s;
   }
   .video-card:hover .play-overlay{opacity:1}
-  .thumb .play-overlay i{font-size:2.4rem;color:#fff}
-  .card-body{padding:.85rem .9rem 1rem;display:flex;flex-direction:column;flex:1}
-  .card-title{font-weight:600;font-size:.95rem;margin-bottom:.25rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
-  .card-sub{color:var(--muted);font-size:.78rem;margin-bottom:.55rem}
-  .card-actions{display:flex;align-items:center;gap:.35rem;flex-wrap:wrap;margin-top:auto}
+  .thumb .play-overlay .play-circle{
+    width:56px;height:56px;border-radius:50%;
+    background:rgba(255,255,255,.95);color:var(--coral);
+    display:flex;align-items:center;justify-content:center;
+    font-size:1.3rem;
+    box-shadow:0 10px 30px rgba(0,0,0,.5);
+    transition:.2s;
+  }
+  .video-card:hover .play-circle{transform:scale(1.1)}
+  .card-body{padding:.9rem 1rem 1rem;display:flex;flex-direction:column;flex:1}
+  .card-title{font-weight:600;font-size:.95rem;margin-bottom:.3rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.35;word-break:break-word}
+  .card-sub{color:var(--text-3);font-size:.76rem;margin-bottom:.7rem}
+  .card-actions{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;margin-top:auto}
   .act-btn{
-    display:inline-flex;align-items:center;gap:.3rem;padding:.32rem .6rem;border-radius:30px;
-    font-size:.78rem;color:var(--muted);background:var(--surface-2);transition:.12s;
+    display:inline-flex;align-items:center;gap:.35rem;
+    padding:.35rem .7rem;border-radius:30px;
+    font-size:.78rem;color:var(--text-2);
+    background:var(--glass);
+    border:1px solid var(--border);
+    transition:.15s;
   }
-  .act-btn:hover{color:#fff;background:#2a303c}
-  .act-btn.liked{color:var(--accent)}
-  .act-btn.liked i{color:var(--accent)}
+  .act-btn:hover{color:#fff;background:var(--glass-2);border-color:var(--border-2)}
+  .act-btn.liked{color:var(--coral);border-color:rgba(255,107,107,.3);background:rgba(255,107,107,.1)}
+  .act-btn.liked i{color:var(--coral)}
 
-  /* ============ COMMENTS IN CARD ============ */
-  .comments{margin-top:.7rem;border-top:1px solid var(--border);padding-top:.7rem;display:none}
+  /* ============ COMMENTS (inline) ============ */
+  .comments{margin-top:.75rem;border-top:1px solid var(--border);padding-top:.75rem;display:none}
   .comments.open{display:block}
-  .comment-form{display:flex;gap:.4rem;margin-bottom:.55rem}
+  .comment-form{display:flex;gap:.4rem;margin-bottom:.6rem}
   .comment-form input{
-    flex:1;min-width:0;background:var(--bg);border:1px solid var(--border);
-    border-radius:30px;padding:.45rem .8rem;outline:none;font-size:.82rem;
+    flex:1;min-width:0;background:rgba(0,0,0,.3);
+    border:1px solid var(--border);border-radius:30px;
+    padding:.5rem .85rem;outline:none;font-size:.82rem;
   }
-  .comment-form input:focus{border-color:var(--accent-2)}
-  .comment-form button{width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;flex-shrink:0}
-  .comment-list{max-height:160px;overflow-y:auto;display:flex;flex-direction:column;gap:.35rem}
-  .comment-item{background:var(--bg);padding:.45rem .7rem;border-radius:10px;font-size:.8rem;border-left:2px solid var(--accent-2);word-break:break-word}
-  .comment-item b{color:#fff;margin-right:.3rem}
+  .comment-form input:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(78,205,196,.1)}
+  .comment-form button{
+    width:36px;height:36px;border-radius:50%;
+    background:linear-gradient(135deg,var(--coral),var(--coral-2));
+    color:#fff;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .comment-list{max-height:160px;overflow-y:auto;display:flex;flex-direction:column;gap:.4rem}
+  .comment-item{
+    background:rgba(0,0,0,.3);padding:.5rem .8rem;border-radius:12px;
+    font-size:.8rem;border-left:2px solid var(--teal);word-break:break-word;line-height:1.4;
+  }
+  .comment-item b{color:#fff;margin-right:.35rem;font-weight:600}
 
   /* ============ EMPTY ============ */
-  .empty{padding:2.5rem 1rem;text-align:center;background:var(--surface);border:1px dashed var(--border);border-radius:var(--radius);color:var(--muted);margin-top:1rem}
-  .empty i{font-size:2.4rem;margin-bottom:.6rem;color:#2d3a4e;display:block}
-
-  /* ============ SHORT VIDEO PLAYER MODAL ============ */
-  .modal-bg{
-    position:fixed;inset:0;background:rgba(0,0,0,.92);backdrop-filter:blur(6px);
+  .empty{
+    padding:3rem 1.5rem;text-align:center;
+    background:var(--glass);border:1.5px dashed var(--border);
+    border-radius:var(--radius);color:var(--text-3);margin-top:1rem;
+  }
+  .empty .empty-icon{
+    width:64px;height:64px;margin:0 auto 1rem;
+    border-radius:20px;
+    background:linear-gradient(135deg,rgba(255,107,107,.15),rgba(78,205,196,.15));
     display:flex;align-items:center;justify-content:center;
-    z-index:100;visibility:hidden;opacity:0;transition:.2s;
+    font-size:1.6rem;color:var(--coral);
+  }
+  .empty p{font-size:.9rem;line-height:1.5}
+
+  /* ============ SHORT PLAYER MODAL ============ */
+  .modal-bg{
+    position:fixed;inset:0;
+    background:rgba(0,0,0,.94);
+    backdrop-filter:blur(10px);
+    display:flex;align-items:center;justify-content:center;
+    z-index:100;visibility:hidden;opacity:0;transition:.25s;
     padding:0;
   }
   .modal-bg.active{visibility:visible;opacity:1}
   .short-player{
-    width:100%;max-width:460px;height:100vh;max-height:100vh;
-    background:#000;position:relative;display:flex;flex-direction:column;
-    overflow:hidden;
+    width:100%;max-width:480px;
+    height:100vh;max-height:100vh;
+    background:#000;position:relative;
+    display:flex;flex-direction:column;overflow:hidden;
   }
   .short-player .close{
-    position:absolute;top:calc(.75rem + var(--safe-t));right:.75rem;
-    width:38px;height:38px;border-radius:50%;
-    background:rgba(0,0,0,.6);color:#fff;
-    display:flex;align-items:center;justify-content:center;z-index:5;
+    position:absolute;top:calc(.85rem + var(--safe-t));right:.85rem;
+    width:40px;height:40px;border-radius:50%;
+    background:rgba(0,0,0,.6);backdrop-filter:blur(10px);
+    color:#fff;display:flex;align-items:center;justify-content:center;
+    z-index:5;border:1px solid rgba(255,255,255,.15);
+    transition:.15s;
   }
-  .short-player .close:hover{background:var(--accent)}
+  .short-player .close:hover{background:var(--coral);border-color:var(--coral)}
   .short-video-wrap{
     flex:1;min-height:0;position:relative;
     display:flex;align-items:center;justify-content:center;
@@ -222,37 +429,53 @@
   .short-video-wrap video{width:100%;height:100%;object-fit:contain;background:#000}
   .short-overlay{
     position:absolute;bottom:0;left:0;right:0;
-    padding:1rem 1rem calc(1rem + var(--safe-b));
-    background:linear-gradient(to top,rgba(0,0,0,.85),transparent);
-    z-index:3;display:flex;flex-direction:column;gap:.75rem;
+    padding:1.5rem 1.1rem calc(1.1rem + var(--safe-b));
+    background:linear-gradient(to top,rgba(0,0,0,.9) 10%,rgba(0,0,0,.5) 50%,transparent);
+    z-index:3;display:flex;flex-direction:column;gap:.85rem;
   }
-  .short-title{font-weight:700;font-size:1rem;line-height:1.35;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6);word-break:break-word}
-  .short-meta{color:#cfd9e6;font-size:.8rem}
-  .short-actions{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}
-  .short-actions .act-btn{background:rgba(255,255,255,.12);color:#fff;backdrop-filter:blur(6px);font-size:.82rem}
-  .short-actions .act-btn:hover{background:rgba(255,255,255,.22)}
-  .short-actions .act-btn.liked{color:var(--accent);background:rgba(255,59,92,.18)}
+  .short-title{font-weight:800;font-size:1.05rem;line-height:1.35;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.8);word-break:break-word;letter-spacing:-.01em}
+  .short-meta{color:rgba(255,255,255,.75);font-size:.82rem;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+  .short-meta .dot{width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,.5)}
+  .short-actions{display:flex;align-items:center;gap:.55rem;flex-wrap:wrap}
+  .short-actions .act-btn{
+    background:rgba(255,255,255,.12);
+    backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,.15);
+    color:#fff;font-size:.82rem;
+    padding:.45rem .85rem;
+  }
+  .short-actions .act-btn:hover{background:rgba(255,255,255,.24);border-color:rgba(255,255,255,.3)}
+  .short-actions .act-btn.liked{background:rgba(255,107,107,.25);border-color:rgba(255,107,107,.5);color:#fff}
+  .short-actions .act-btn.liked i{color:var(--coral)}
+
   .short-comments{
-    background:var(--surface);border-radius:16px 16px 0 0;
-    max-height:38vh;display:none;flex-direction:column;
+    background:var(--bg-2);
+    border-radius:24px 24px 0 0;
+    max-height:42vh;display:none;flex-direction:column;
     border-top:1px solid var(--border);
+    animation:slideUp .25s ease;
   }
   .short-comments.open{display:flex}
-  .short-comments .comment-form{padding:.7rem .8rem;border-bottom:1px solid var(--border);margin:0}
-  .short-comments .comment-list{padding:.6rem .8rem calc(.6rem + var(--safe-b));overflow-y:auto}
+  @keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .short-comments .comment-form{padding:.85rem 1rem;border-bottom:1px solid var(--border);margin:0}
+  .short-comments .comment-list{padding:.75rem 1rem calc(.75rem + var(--safe-b));overflow-y:auto}
 
   /* ============ TOAST ============ */
   .toast{
-    position:fixed;bottom:calc(1.25rem + var(--safe-b));left:50%;
+    position:fixed;bottom:calc(1.5rem + var(--safe-b));left:50%;
     transform:translateX(-50%) translateY(150%);
-    background:#1f242e;border:1px solid var(--border);
-    padding:.7rem 1.2rem;border-radius:40px;font-size:.88rem;
-    z-index:500;transition:.3s ease;box-shadow:0 15px 30px -10px #000;
+    background:rgba(18,18,26,.95);
+    backdrop-filter:blur(20px);
+    border:1px solid var(--border-2);
+    padding:.8rem 1.4rem;border-radius:40px;
+    font-size:.88rem;font-weight:500;
+    z-index:500;transition:.3s cubic-bezier(.34,1.56,.64,1);
+    box-shadow:0 20px 40px -10px rgba(0,0,0,.8);
     max-width:90vw;text-align:center;word-break:break-word;
   }
   .toast.show{transform:translateX(-50%) translateY(0)}
-  .toast.ok{border-color:#22c55e}
-  .toast.err{border-color:var(--accent)}
+  .toast.ok{border-color:rgba(78,205,196,.5);box-shadow:0 20px 40px -10px rgba(78,205,196,.3)}
+  .toast.err{border-color:rgba(255,107,107,.5);box-shadow:0 20px 40px -10px rgba(255,107,107,.3)}
 
   /* ============ RESPONSIVE ============ */
   @media (max-width:1100px){
@@ -260,30 +483,45 @@
   }
   @media (max-width:900px){
     .sidebar{display:none}
-    .main{padding:1rem 1rem calc(4rem + var(--safe-b))}
+    .main{padding:1.1rem 1rem calc(4rem + var(--safe-b))}
     .search-wrap{max-width:100%}
+    .profile-head{padding:0 1.1rem 1.1rem}
   }
   @media (max-width:640px){
-    :root{--nav-h:58px}
-    .topnav{padding:0 .5rem;gap:.4rem}
-    .brand .logo-text{display:none}
-    .btn span{display:none}
-    .btn{padding:.5rem .7rem}
-    .search-wrap input{padding:.5rem .7rem;font-size:.88rem}
-    .search-wrap button{padding:.5rem .75rem}
-    .profile-head{flex-direction:column;align-items:flex-start;gap:.75rem}
-    .avatar-xl{width:84px;height:84px;font-size:1.9rem}
-    .profile-meta h1{font-size:1.35rem}
-    .video-grid{grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:.75rem}
-    .card-body{padding:.65rem .7rem .8rem}
-    .card-title{font-size:.88rem}
-    .card-sub{font-size:.72rem}
-    .act-btn{font-size:.72rem;padding:.28rem .5rem}
+    :root{--nav-h:60px}
+    .topnav{padding:0 .6rem;gap:.4rem}
+    .brand .name{display:none}
+    .pill-btn span{display:none}
+    .pill-btn{padding:.55rem .8rem}
+    .search-wrap input{padding:.55rem .75rem;font-size:.85rem}
+    .search-wrap button{padding:.55rem .8rem}
+    .profile-head{flex-direction:column;align-items:flex-start;gap:.85rem;padding:0 1rem 1rem}
+    .avatar-xl{width:88px;height:88px;font-size:2rem}
+    .profile-meta h1{font-size:1.4rem}
+    .profile-meta .handle{font-size:.82rem}
+    .stats{gap:1rem;font-size:.78rem}
+    .panel{padding:1.1rem 1.15rem;border-radius:20px}
+    .video-grid{grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:.85rem}
+    .card-body{padding:.7rem .75rem .85rem}
+    .card-title{font-size:.86rem}
+    .card-sub{font-size:.7rem;margin-bottom:.55rem}
+    .act-btn{font-size:.72rem;padding:.3rem .55rem}
+    .act-btn span{display:none}
     .short-player{max-width:100vw}
+    .auth-card{padding:1.75rem 1.35rem}
+    .auth-title{font-size:1.45rem}
+    .thumb .play-circle{width:46px;height:46px;font-size:1.1rem}
   }
   @media (max-width:400px){
-    .video-grid{grid-template-columns:1fr 1fr;gap:.6rem}
+    .video-grid{grid-template-columns:1fr 1fr;gap:.65rem}
+    .act-btn span{display:none}
+    .act-btn{padding:.35rem}
   }
+  /* scrollbar */
+  ::-webkit-scrollbar{width:6px;height:6px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:3px}
+  ::-webkit-scrollbar-thumb:hover{background:var(--text-3)}
 </style>
 </head>
 <body>
@@ -291,8 +529,8 @@
 <!-- ================= TOP NAV ================= -->
 <header class="topnav">
   <a href="#" class="brand">
-    <div class="logo"><i class="fas fa-play"></i></div>
-    <div class="logo-text">Free<span>Time</span></div>
+    <div class="mark"><i class="fas fa-bolt"></i></div>
+    <div class="name">Free<b>Time</b></div>
   </a>
 
   <div class="search-wrap">
@@ -301,28 +539,30 @@
   </div>
 
   <div class="nav-actions" id="navActions">
-    <button class="btn btn-primary" id="navSignIn"><i class="fas fa-arrow-right-to-bracket"></i> <span>Sign in</span></button>
-    <button class="btn btn-outline" id="navSignUp"><i class="fas fa-user-plus"></i> <span>Sign up</span></button>
+    <button class="pill-btn pill-glass" id="navSignIn"><i class="fas fa-arrow-right-to-bracket"></i> <span>Sign in</span></button>
+    <button class="pill-btn pill-primary" id="navSignUp"><i class="fas fa-sparkles"></i> <span>Join</span></button>
   </div>
 
   <div class="nav-actions hidden" id="navUser">
-    <button class="btn btn-outline" id="navUploadTop"><i class="fas fa-cloud-upload-alt"></i> <span>Upload</span></button>
+    <button class="pill-btn pill-glass" id="navUploadTop"><i class="fas fa-cloud-upload-alt"></i> <span>Upload</span></button>
     <div class="avatar" id="navAvatar" title="Profile">FT</div>
-    <button class="btn btn-ghost" id="navSignOut" title="Sign out"><i class="fas fa-right-from-bracket"></i></button>
+    <button class="pill-icon" id="navSignOut" title="Sign out"><i class="fas fa-right-from-bracket"></i></button>
   </div>
 </header>
 
-<!-- ================= APP SHELL ================= -->
+<!-- ================= SHELL ================= -->
 <div class="shell">
 
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
+    <div class="side-label">Discover</div>
     <div class="side-item active" data-nav="home"><i class="fas fa-house"></i> Home</div>
     <div class="side-item" data-nav="trending"><i class="fas fa-fire"></i> Trending</div>
     <div class="side-item" data-nav="subscriptions"><i class="fas fa-users"></i> Subscriptions</div>
     <div class="side-divider"></div>
+    <div class="side-label">Your Space</div>
     <div class="side-item" data-nav="myvideos"><i class="fas fa-video"></i> My Videos</div>
-    <div class="side-item" data-nav="liked"><i class="fas fa-heart"></i> Liked Videos</div>
+    <div class="side-item" data-nav="liked"><i class="fas fa-heart"></i> Liked</div>
     <div class="side-divider"></div>
     <div class="side-item" data-nav="about"><i class="fas fa-circle-info"></i> About</div>
   </aside>
@@ -333,6 +573,9 @@
     <!-- AUTH -->
     <div id="authScreen" class="auth-screen">
       <div class="auth-card">
+        <h1 class="auth-title">Welcome to <span>FreeTime</span></h1>
+        <p class="auth-sub">Share your moments with the world</p>
+
         <div class="auth-tabs">
           <button class="auth-tab active" id="tabSignIn">Sign in</button>
           <button class="auth-tab" id="tabSignUp">Sign up</button>
@@ -373,13 +616,13 @@
     <!-- APP -->
     <div id="appContent" class="hidden">
 
-      <div id="profileHead">
+      <div class="profile-hero" id="profileHero">
         <div class="profile-banner"></div>
         <div class="profile-head">
           <div class="avatar-xl" id="profileAvatar">FT</div>
           <div class="profile-meta">
             <h1 id="profileName">Your Channel</h1>
-            <div class="username" id="profileUsername">@yourhandle</div>
+            <div class="handle" id="profileUsername">@yourhandle</div>
             <div class="stats">
               <div><b id="statVideos">0</b> videos</div>
               <div><b id="statViews">0</b> views</div>
@@ -391,7 +634,7 @@
       </div>
 
       <div class="panel" id="uploadPanel">
-        <h2><i class="fas fa-cloud-upload-alt"></i> Upload a new video</h2>
+        <h2><span class="icon-wrap"><i class="fas fa-cloud-upload-alt"></i></span> Upload a new video</h2>
         <div class="field">
           <label>Title</label>
           <input type="text" id="uploadTitle" placeholder="Give your video a title…" maxlength="200">
@@ -404,17 +647,17 @@
           <label class="file-btn" for="videoFile"><i class="fas fa-folder-open"></i> Choose video</label>
           <input type="file" id="videoFile" accept="video/*" class="hidden">
           <span class="file-name" id="fileName">No file selected</span>
-          <button class="btn btn-primary" id="uploadBtn"><i class="fas fa-arrow-up"></i> Upload</button>
+          <button class="btn-upload" id="uploadBtn"><i class="fas fa-arrow-up"></i> Upload</button>
         </div>
       </div>
 
       <div class="grid-title">
         <h2 id="feedTitle">My Videos</h2>
-        <span class="muted" id="feedCount">0 videos</span>
+        <span class="count" id="feedCount">0 videos</span>
       </div>
       <div class="video-grid" id="videoGrid"></div>
       <div class="empty" id="emptyFeed">
-        <i class="fas fa-video"></i>
+        <div class="empty-icon"><i class="fas fa-video"></i></div>
         <p>No videos yet. Upload your first video to get started!</p>
       </div>
 
@@ -422,7 +665,7 @@
   </main>
 </div>
 
-<!-- ================= SHORT VIDEO PLAYER MODAL ================= -->
+<!-- ================= SHORT PLAYER ================= -->
 <div class="modal-bg" id="playerModal">
   <div class="short-player">
     <button class="close" id="playerClose"><i class="fas fa-times"></i></button>
@@ -449,35 +692,22 @@
 <!-- ================= TOAST ================= -->
 <div class="toast" id="toast"></div>
 
-<!-- ================= APP SCRIPT ================= -->
+<!-- ================= SCRIPT ================= -->
 <script>
-/* ============================================================
-   FREETIME APP · Supabase backend
-   ============================================================ */
 const SUPABASE_URL = 'https://riyotfeepgscpjalnekz.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_K0aOpQUQmpiEDQHM1IcEFQ_40EfInwV';
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-/* ---------------- STATE ---------------- */
 const state = { user: null, profile: null, videos: [], view: 'home', search: '' };
 
-/* ---------------- DOM ---------------- */
-const $  = (s) => document.querySelector(s);
+const $ = (s) => document.querySelector(s);
 const $$ = (s) => document.querySelectorAll(s);
+const authScreen = $('#authScreen'), appContent = $('#appContent');
+const navActions = $('#navActions'), navUser = $('#navUser'), navAvatar = $('#navAvatar');
+const videoGrid = $('#videoGrid'), emptyFeed = $('#emptyFeed');
+const feedTitle = $('#feedTitle'), feedCount = $('#feedCount'), toastEl = $('#toast');
 
-const authScreen   = $('#authScreen');
-const appContent   = $('#appContent');
-const navActions   = $('#navActions');
-const navUser      = $('#navUser');
-const navAvatar    = $('#navAvatar');
-const videoGrid    = $('#videoGrid');
-const emptyFeed    = $('#emptyFeed');
-const feedTitle    = $('#feedTitle');
-const feedCount    = $('#feedCount');
-const toastEl      = $('#toast');
-
-/* ---------------- HELPERS ---------------- */
 function toast(msg, type = 'ok') {
   toastEl.textContent = msg;
   toastEl.className = 'toast show ' + (type === 'err' ? 'err' : 'ok');
@@ -494,8 +724,7 @@ function fmtNum(n) {
 }
 function fmtDate(iso) {
   if (!iso) return '';
-  const d = new Date(iso);
-  const diff = (Date.now() - d.getTime()) / 1000;
+  const d = new Date(iso), diff = (Date.now() - d.getTime()) / 1000;
   if (diff < 60) return 'just now';
   if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
   if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
@@ -506,7 +735,7 @@ function initials(name = 'FT') {
   return name.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase() || 'FT';
 }
 
-/* ---------------- AUTH UI ---------------- */
+/* AUTH UI */
 $('#navSignIn').onclick = () => showAuth('signin');
 $('#navSignUp').onclick = () => showAuth('signup');
 $('#navUploadTop').onclick = () => {
@@ -515,11 +744,7 @@ $('#navUploadTop').onclick = () => {
 };
 $('#navSignOut').onclick = async () => { await sb.auth.signOut(); toast('Signed out'); };
 
-function showAuth(tab) {
-  authScreen.classList.remove('hidden');
-  appContent.classList.add('hidden');
-  switchTab(tab);
-}
+function showAuth(tab) { authScreen.classList.remove('hidden'); appContent.classList.add('hidden'); switchTab(tab); }
 function switchTab(tab) {
   const isSignIn = tab === 'signin';
   $('#tabSignIn').classList.toggle('active', isSignIn);
@@ -530,119 +755,74 @@ function switchTab(tab) {
 $('#tabSignIn').onclick = () => switchTab('signin');
 $('#tabSignUp').onclick = () => switchTab('signup');
 
-/* ---------------- SIGN UP ---------------- */
+/* SIGN UP */
 $('#formSignUp').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const email    = $('#signUpEmail').value.trim();
+  const email = $('#signUpEmail').value.trim();
   const password = $('#signUpPassword').value;
   const username = $('#signUpUsername').value.trim().toLowerCase();
-  const msg      = $('#signUpMsg');
-  msg.className  = 'auth-msg';
-  msg.textContent = 'Creating account…';
-
-  const { data, error } = await sb.auth.signUp({
-    email,
-    password,
-    options: { data: { username } }
-  });
-
-  if (error) {
-    msg.className = 'auth-msg error';
-    msg.textContent = error.message;
-    return;
-  }
-
-  msg.className = 'auth-msg ok';
-  msg.textContent = 'Account created! You are now signed in.';
+  const msg = $('#signUpMsg');
+  msg.className = 'auth-msg'; msg.textContent = 'Creating account…';
+  const { error } = await sb.auth.signUp({ email, password, options: { data: { username } } });
+  if (error) { msg.className = 'auth-msg error'; msg.textContent = error.message; return; }
+  msg.className = 'auth-msg ok'; msg.textContent = 'Account created! You are now signed in.';
 });
 
-/* ---------------- SIGN IN ---------------- */
+/* SIGN IN */
 $('#formSignIn').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const email    = $('#signInEmail').value.trim();
+  const email = $('#signInEmail').value.trim();
   const password = $('#signInPassword').value;
-  const msg      = $('#signInMsg');
-  msg.className  = 'auth-msg';
-  msg.textContent = 'Signing in…';
-
+  const msg = $('#signInMsg');
+  msg.className = 'auth-msg'; msg.textContent = 'Signing in…';
   const { error } = await sb.auth.signInWithPassword({ email, password });
   if (error) { msg.className = 'auth-msg error'; msg.textContent = error.message; return; }
-  msg.className = 'auth-msg ok';
-  msg.textContent = 'Welcome back!';
+  msg.className = 'auth-msg ok'; msg.textContent = 'Welcome back!';
 });
 
-/* ---------------- SESSION ---------------- */
+/* SESSION */
 sb.auth.onAuthStateChange(async (event, session) => {
-  if (session?.user) {
-    state.user = session.user;
-    await loadProfile();
-    await enterApp();
-  } else {
-    state.user = null;
-    state.profile = null;
-    state.videos = [];
-    exitApp();
-  }
+  if (session?.user) { state.user = session.user; await loadProfile(); await enterApp(); }
+  else { state.user = null; state.profile = null; state.videos = []; exitApp(); }
 });
 
 async function loadProfile() {
-  const { data, error } = await sb
-    .from('profiles')
-    .select('*')
-    .eq('id', state.user.id)
-    .maybeSingle();
-
+  const { data, error } = await sb.from('profiles').select('*').eq('id', state.user.id).maybeSingle();
   if (error) { console.error('profile load', error); return; }
-
   if (!data) {
     const meta = state.user.user_metadata || {};
     const username = (meta.username || state.user.email.split('@')[0] || 'user').toLowerCase();
     const { data: created } = await sb.from('profiles').insert({
-      id: state.user.id,
-      username,
-      email: state.user.email,
-      full_name: username,
+      id: state.user.id, username, email: state.user.email, full_name: username
     }).select().maybeSingle();
     state.profile = created;
-  } else {
-    state.profile = data;
-  }
+  } else { state.profile = data; }
 }
 
 async function enterApp() {
-  authScreen.classList.add('hidden');
-  appContent.classList.remove('hidden');
-  navActions.classList.add('hidden');
-  navUser.classList.remove('hidden');
-
+  authScreen.classList.add('hidden'); appContent.classList.remove('hidden');
+  navActions.classList.add('hidden'); navUser.classList.remove('hidden');
   const p = state.profile || {};
   const name = p.full_name || p.username || 'Your Channel';
   $('#profileName').textContent = name;
   $('#profileUsername').textContent = '@' + (p.username || 'user');
   $('#profileAvatar').textContent = initials(name);
   navAvatar.textContent = initials(name);
-
   await loadVideos();
   renderProfileStats();
 }
 
 function exitApp() {
-  authScreen.classList.remove('hidden');
-  appContent.classList.add('hidden');
-  navActions.classList.remove('hidden');
-  navUser.classList.add('hidden');
+  authScreen.classList.remove('hidden'); appContent.classList.add('hidden');
+  navActions.classList.remove('hidden'); navUser.classList.add('hidden');
   state.videos = [];
 }
 
-/* ---------------- VIDEO LOADING ---------------- */
+/* LOAD VIDEOS */
 async function loadVideos() {
   if (!state.user) return;
-
   let query = sb.from('videos').select('*').order('created_at', { ascending: false });
-
-  if (state.view === 'myvideos' || state.view === 'profile') {
-    query = query.eq('user_id', state.user.id);
-  }
+  if (state.view === 'myvideos') query = query.eq('user_id', state.user.id);
   if (state.view === 'liked') {
     const { data: likes } = await sb.from('video_likes').select('video_id').eq('user_id', state.user.id);
     const ids = (likes || []).map(l => l.video_id);
@@ -650,32 +830,22 @@ async function loadVideos() {
     query = query.in('id', ids);
   }
   if (state.search) query = query.ilike('title', `%${state.search}%`);
-
   const { data, error } = await query.limit(60);
   if (error) { console.error(error); toast('Could not load videos', 'err'); return; }
-
   state.videos = data || [];
-  renderVideos();
-  renderProfileStats();
+  renderVideos(); renderProfileStats();
 }
 
-/* ---------------- RENDER GRID ---------------- */
+/* RENDER */
 function renderVideos() {
   const vids = state.videos;
-
   feedTitle.textContent =
-    state.view === 'liked'         ? 'Liked Videos' :
-    state.view === 'trending'      ? 'Trending' :
+    state.view === 'liked' ? 'Liked Videos' :
+    state.view === 'trending' ? 'Trending' :
     state.view === 'subscriptions' ? 'Subscriptions' :
-    state.view === 'home'          ? 'Home' :
-    'My Videos';
+    state.view === 'home' ? 'Home' : 'My Videos';
   feedCount.textContent = `${vids.length} video${vids.length === 1 ? '' : 's'}`;
-
-  if (!vids.length) {
-    videoGrid.innerHTML = '';
-    emptyFeed.classList.remove('hidden');
-    return;
-  }
+  if (!vids.length) { videoGrid.innerHTML = ''; emptyFeed.classList.remove('hidden'); return; }
   emptyFeed.classList.add('hidden');
 
   videoGrid.innerHTML = vids.map(v => {
@@ -684,7 +854,7 @@ function renderVideos() {
       <div class="video-card" data-id="${v.id}">
         <div class="thumb">
           ${v.thumbnail_url ? `<img src="${esc(v.thumbnail_url)}" alt="">` : `<i class="fas fa-play-circle"></i>`}
-          <div class="play-overlay"><i class="fas fa-play"></i></div>
+          <div class="play-overlay"><div class="play-circle"><i class="fas fa-play"></i></div></div>
         </div>
         <div class="card-body">
           <div class="card-title">${esc(v.title)}</div>
@@ -727,17 +897,11 @@ function renderVideos() {
   $$('.share-btn').forEach(b => b.onclick = (e) => {
     e.stopPropagation();
     const url = `${location.origin}${location.pathname}?v=${b.dataset.id}`;
-    if (navigator.share) {
-      navigator.share({ title: 'FreeTime video', url }).catch(() => {});
-    } else {
-      navigator.clipboard?.writeText(url).then(() => toast('Link copied!'), () => toast('Share: ' + url));
-    }
+    if (navigator.share) navigator.share({ title: 'FreeTime video', url }).catch(() => {});
+    else navigator.clipboard?.writeText(url).then(() => toast('Link copied!'), () => toast('Share: ' + url));
   });
   $$('[data-comment-send]').forEach(btn => {
-    btn.onclick = (e) => {
-      e.stopPropagation();
-      submitComment(btn.dataset.commentSend, `[data-comment-input="${btn.dataset.commentSend}"]`);
-    };
+    btn.onclick = (e) => { e.stopPropagation(); submitComment(btn.dataset.commentSend, `[data-comment-input="${btn.dataset.commentSend}"]`); };
   });
   $$('[data-comment-input]').forEach(inp => {
     inp.addEventListener('keydown', (e) => {
@@ -748,45 +912,31 @@ function renderVideos() {
 
 function renderProfileStats() {
   const vids = state.videos;
-  const totalViews = vids.reduce((s, v) => s + (v.view_count || 0), 0);
-  const totalLikes = vids.reduce((s, v) => s + (v.like_count || 0), 0);
-  $('#statVideos').textContent    = vids.length;
-  $('#statViews').textContent     = fmtNum(totalViews);
-  $('#statLikes').textContent     = fmtNum(totalLikes);
+  const tv = vids.reduce((s, v) => s + (v.view_count || 0), 0);
+  const tl = vids.reduce((s, v) => s + (v.like_count || 0), 0);
+  $('#statVideos').textContent = vids.length;
+  $('#statViews').textContent = fmtNum(tv);
+  $('#statLikes').textContent = fmtNum(tl);
   $('#statFollowers').textContent = fmtNum(state.profile?.follower_count || 0);
 }
 
-/* ---------------- LIKE ---------------- */
+/* LIKE */
 async function toggleLike(videoId) {
   if (!state.user) return;
-  const already = await sb.from('video_likes')
-    .select('video_id', { count: 'exact', head: true })
-    .eq('user_id', state.user.id).eq('video_id', videoId);
+  const already = await sb.from('video_likes').select('video_id', { count: 'exact', head: true }).eq('user_id', state.user.id).eq('video_id', videoId);
   const isLiked = (already.count || 0) > 0;
-
-  if (isLiked) {
-    await sb.from('video_likes').delete().eq('user_id', state.user.id).eq('video_id', videoId);
-  } else {
-    await sb.from('video_likes').insert({ user_id: state.user.id, video_id: videoId });
-  }
-
+  if (isLiked) await sb.from('video_likes').delete().eq('user_id', state.user.id).eq('video_id', videoId);
+  else await sb.from('video_likes').insert({ user_id: state.user.id, video_id: videoId });
   const { data } = await sb.from('videos').select('*').eq('id', videoId).maybeSingle();
-  if (data) {
-    data.__liked = !isLiked;
-    const idx = state.videos.findIndex(v => v.id === videoId);
-    if (idx > -1) state.videos[idx] = data;
-  }
+  if (data) { data.__liked = !isLiked; const idx = state.videos.findIndex(v => v.id === videoId); if (idx > -1) state.videos[idx] = data; }
   renderVideos();
 }
 
-/* ---------------- COMMENTS ---------------- */
+/* COMMENTS */
 async function loadComments(videoId) {
   const listEl = document.querySelector(`[data-comment-list="${videoId}"]`);
   if (!listEl) return;
-  const { data, error } = await sb.from('comments')
-    .select('*, profiles:user_id(username, full_name)')
-    .eq('video_id', videoId)
-    .order('created_at', { ascending: true });
+  const { data, error } = await sb.from('comments').select('*, profiles:user_id(username, full_name)').eq('video_id', videoId).order('created_at', { ascending: true });
   if (error) { console.error(error); return; }
   listEl.innerHTML = (data || []).map(c => {
     const name = c.profiles?.full_name || c.profiles?.username || 'User';
@@ -798,11 +948,7 @@ async function submitComment(videoId, input) {
   const el = typeof input === 'string' ? document.querySelector(input) : input;
   const text = el?.value?.trim();
   if (!text || !state.user) return;
-  const { error } = await sb.from('comments').insert({
-    video_id: videoId,
-    user_id: state.user.id,
-    content: text,
-  });
+  const { error } = await sb.from('comments').insert({ video_id: videoId, user_id: state.user.id, content: text });
   if (error) { toast(error.message, 'err'); return; }
   el.value = '';
   await loadComments(videoId);
@@ -811,7 +957,7 @@ async function submitComment(videoId, input) {
   renderVideos();
 }
 
-/* ---------------- UPLOAD ---------------- */
+/* UPLOAD */
 $('#videoFile').addEventListener('change', (e) => {
   const f = e.target.files[0];
   $('#fileName').textContent = f ? f.name : 'No file selected';
@@ -819,69 +965,49 @@ $('#videoFile').addEventListener('change', (e) => {
 
 $('#uploadBtn').addEventListener('click', async () => {
   if (!state.user) return showAuth('signin');
-  const file  = $('#videoFile').files[0];
+  const file = $('#videoFile').files[0];
   const title = $('#uploadTitle').value.trim();
-  const desc  = $('#uploadDesc').value.trim();
-
-  if (!file)  { toast('Please choose a video file', 'err'); return; }
+  const desc = $('#uploadDesc').value.trim();
+  if (!file) { toast('Please choose a video file', 'err'); return; }
   if (!title) { toast('Please enter a title', 'err'); return; }
-
   const btn = $('#uploadBtn');
   btn.disabled = true;
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading…';
-
   try {
-    const ext  = file.name.split('.').pop();
+    const ext = file.name.split('.').pop();
     const path = `${state.user.id}/${Date.now()}.${ext}`;
     const { error: upErr } = await sb.storage.from('videos').upload(path, file, { upsert: false });
     if (upErr) throw upErr;
-
     const { data: urlData } = sb.storage.from('videos').getPublicUrl(path);
-
     const { error: dbErr } = await sb.from('videos').insert({
-      user_id: state.user.id,
-      title,
-      description: desc || null,
-      video_url: urlData.publicUrl,
-      visibility: 'public',
+      user_id: state.user.id, title, description: desc || null,
+      video_url: urlData.publicUrl, visibility: 'public'
     });
     if (dbErr) throw dbErr;
-
     toast('Video uploaded!');
-    $('#videoFile').value = '';
-    $('#uploadTitle').value = '';
-    $('#uploadDesc').value = '';
+    $('#videoFile').value = ''; $('#uploadTitle').value = ''; $('#uploadDesc').value = '';
     $('#fileName').textContent = 'No file selected';
-
     await loadVideos();
   } catch (err) {
-    console.error(err);
-    toast(err.message || 'Upload failed', 'err');
+    console.error(err); toast(err.message || 'Upload failed', 'err');
   } finally {
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fas fa-arrow-up"></i> Upload';
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-arrow-up"></i> Upload';
   }
 });
 
-/* ---------------- SHORT PLAYER ---------------- */
-const playerModal  = $('#playerModal');
-const playerVideo  = $('#playerVideo');
-const playerTitle  = $('#playerTitle');
-const playerMeta   = $('#playerMeta');
-const playerActions = $('#playerActions');
-const playerComments = $('#playerComments');
-const playerCommentList = $('#playerCommentList');
-const playerCommentInput = $('#playerCommentInput');
-
+/* PLAYER */
+const playerModal = $('#playerModal'), playerVideo = $('#playerVideo');
+const playerTitle = $('#playerTitle'), playerMeta = $('#playerMeta');
+const playerActions = $('#playerActions'), playerComments = $('#playerComments');
+const playerCommentList = $('#playerCommentList'), playerCommentInput = $('#playerCommentInput');
 let currentPlayerId = null;
 
 async function openPlayer(videoId) {
   const v = state.videos.find(x => x.id === videoId);
   if (!v) return;
   currentPlayerId = videoId;
-
   playerTitle.textContent = v.title;
-  playerMeta.textContent  = `${fmtNum(v.view_count)} views · ${fmtDate(v.created_at)}`;
+  playerMeta.innerHTML = `${fmtNum(v.view_count)} views <span class="dot"></span> ${fmtDate(v.created_at)}`;
   playerVideo.src = v.video_url;
   playerVideo.load();
 
@@ -921,23 +1047,16 @@ playerCommentInput.addEventListener('keydown', async (e) => {
   e.preventDefault();
   const text = playerCommentInput.value.trim();
   if (!text) return;
-  const { error } = await sb.from('comments').insert({
-    video_id: currentPlayerId,
-    user_id: state.user.id,
-    content: text,
-  });
+  const { error } = await sb.from('comments').insert({ video_id: currentPlayerId, user_id: state.user.id, content: text });
   if (error) { toast(error.message, 'err'); return; }
   playerCommentInput.value = '';
   await loadComments(currentPlayerId);
   playerCommentList.innerHTML = document.querySelector(`[data-comment-list="${currentPlayerId}"]`)?.innerHTML || '';
 });
 
-$('#playerCommentSend').onclick = () => {
-  const ev = new KeyboardEvent('keydown', { key: 'Enter' });
-  playerCommentInput.dispatchEvent(ev);
-};
+$('#playerCommentSend').onclick = () => playerCommentInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
 
-/* ---------------- SIDEBAR ---------------- */
+/* SIDEBAR */
 $$('.side-item').forEach(item => {
   item.onclick = () => {
     $$('.side-item').forEach(i => i.classList.remove('active'));
@@ -950,26 +1069,19 @@ $$('.side-item').forEach(item => {
   };
 });
 
-/* ---------------- SEARCH ---------------- */
+/* SEARCH */
 $('#searchBtn').onclick = () => {
   state.search = $('#searchInput').value.trim();
   if (!state.user) return showAuth('signin');
   loadVideos();
 };
-$('#searchInput').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') $('#searchBtn').click();
-});
+$('#searchInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('#searchBtn').click(); });
 
-/* ---------------- BOOT ---------------- */
+/* BOOT */
 (async () => {
   const { data: { session } } = await sb.auth.getSession();
-  if (session?.user) {
-    state.user = session.user;
-    await loadProfile();
-    await enterApp();
-  } else {
-    exitApp();
-  }
+  if (session?.user) { state.user = session.user; await loadProfile(); await enterApp(); }
+  else { exitApp(); }
 })();
 </script>
 </body>

@@ -2,378 +2,287 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f0f12">
 <title>FreeTime — Watch, Share, Connect</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  /* ========= RESET / THEME ========= */
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --bg: #0f0f12;
-    --surface: #181b22;
-    --surface-2: #1f242e;
-    --border: #2a2f3a;
-    --text: #eaeef2;
-    --muted: #8b95a5;
-    --accent: #ff3b5c;
-    --accent-2: #3b82f6;
-    --radius: 16px;
-    --radius-sm: 10px;
+  /* ============ RESET / THEME ============ */
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  :root{
+    --bg:#0f0f12; --surface:#181b22; --surface-2:#1f242e; --border:#2a2f3a;
+    --text:#eaeef2; --muted:#8b95a5; --accent:#ff3b5c; --accent-2:#3b82f6;
+    --radius:16px; --nav-h:64px;
+    --safe-b: env(safe-area-inset-bottom, 0px);
+    --safe-t: env(safe-area-inset-top, 0px);
   }
-  html, body { height: 100%; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Inter, sans-serif;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+  html,body{height:100%}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Inter,sans-serif;
+    min-height:100vh; display:flex; flex-direction:column;
+    -webkit-font-smoothing:antialiased; overscroll-behavior-y:none;
   }
-  a { color: inherit; text-decoration: none; }
-  button { font: inherit; cursor: pointer; border: none; background: none; color: inherit; }
-  input, textarea, select { font: inherit; color: inherit; }
-  img { display: block; max-width: 100%; }
-  .hidden { display: none !important; }
-  .muted { color: var(--muted); }
-  .flex { display: flex; }
-  .gap-1 { gap: .5rem; }
-  .gap-2 { gap: 1rem; }
-  .center { display: flex; align-items: center; justify-content: center; }
-  .between { display: flex; align-items: center; justify-content: space-between; }
+  a{color:inherit;text-decoration:none}
+  button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  input,textarea{font:inherit;color:inherit}
+  img,video{display:block;max-width:100%}
+  .hidden{display:none!important}
+  .muted{color:var(--muted)}
 
-  /* ========= TOP NAV ========= */
-  .topnav {
-    height: 64px;
-    padding: 0 1.25rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    position: sticky; top: 0; z-index: 50;
+  /* ============ TOP NAV ============ */
+  .topnav{
+    height:var(--nav-h); padding:0 .75rem;
+    padding-top:var(--safe-t);
+    display:flex; align-items:center; gap:.6rem;
+    background:var(--surface); border-bottom:1px solid var(--border);
+    position:sticky; top:0; z-index:50;
   }
-  .brand {
-    display: flex; align-items: center; gap: .6rem;
-    font-weight: 800; font-size: 1.35rem; letter-spacing: -.02em;
-    color: #fff; flex-shrink: 0;
+  .brand{display:flex;align-items:center;gap:.5rem;font-weight:800;font-size:1.25rem;color:#fff;flex-shrink:0;letter-spacing:-.02em}
+  .brand .logo{
+    width:34px;height:34px;border-radius:10px;
+    background:linear-gradient(135deg,#ff3b5c,#ff7a00);
+    display:flex;align-items:center;justify-content:center;font-size:1rem;color:#fff;
   }
-  .brand .logo {
-    width: 36px; height: 36px; border-radius: 10px;
-    background: linear-gradient(135deg, #ff3b5c, #ff7a00);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.1rem; color: #fff;
+  .brand .logo-text span{color:var(--accent)}
+  .search-wrap{
+    flex:1; max-width:640px; margin:0 auto;
+    display:flex; align-items:center;
+    background:var(--surface-2); border:1px solid var(--border);
+    border-radius:40px; overflow:hidden; transition:border-color .15s;
   }
-  .brand .logo-text span { color: var(--accent); }
+  .search-wrap:focus-within{border-color:var(--accent-2)}
+  .search-wrap input{flex:1;min-width:0;padding:.6rem .9rem;background:transparent;border:none;outline:none;font-size:.95rem}
+  .search-wrap button{padding:.6rem 1rem;background:var(--surface);color:var(--muted);border-left:1px solid var(--border)}
+  .search-wrap button:hover{color:#fff}
+  .nav-actions{display:flex;align-items:center;gap:.4rem;flex-shrink:0}
+  .btn{display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border-radius:40px;font-weight:600;font-size:.88rem;transition:.15s ease}
+  .btn-primary{background:var(--accent);color:#fff}
+  .btn-primary:hover{background:#e63351}
+  .btn-outline{border:1.5px solid var(--border);background:var(--surface-2)}
+  .btn-outline:hover{border-color:var(--muted)}
+  .btn-ghost{color:var(--muted)}
+  .btn-ghost:hover{color:#fff;background:var(--surface-2)}
+  .avatar{
+    width:36px;height:36px;border-radius:50%;
+    background:linear-gradient(135deg,#2563eb,#7c3aed);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;color:#fff;font-size:.9rem;cursor:pointer;flex-shrink:0;overflow:hidden;
+  }
+  .avatar img{width:100%;height:100%;object-fit:cover}
 
-  .search-wrap {
-    flex: 1; max-width: 640px; margin: 0 auto;
-    display: flex; align-items: center;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: 40px;
-    overflow: hidden;
-    transition: border-color .15s;
-  }
-  .search-wrap:focus-within { border-color: var(--accent-2); }
-  .search-wrap input {
-    flex: 1; padding: .7rem 1rem; background: transparent; border: none; outline: none;
-  }
-  .search-wrap button {
-    padding: .7rem 1.2rem;
-    background: var(--surface);
-    color: var(--muted);
-    border-left: 1px solid var(--border);
-  }
-  .search-wrap button:hover { color: #fff; }
+  /* ============ SHELL ============ */
+  .shell{display:flex;flex:1;min-height:0}
 
-  .nav-actions { display: flex; align-items: center; gap: .6rem; flex-shrink: 0; }
-  .btn {
-    display: inline-flex; align-items: center; gap: .45rem;
-    padding: .55rem 1.1rem; border-radius: 40px;
-    font-weight: 600; font-size: .9rem;
-    transition: .15s ease;
+  /* ============ SIDEBAR (desktop only) ============ */
+  .sidebar{
+    width:220px; flex-shrink:0; padding:1rem .75rem;
+    border-right:1px solid var(--border); background:var(--surface);
+    display:flex; flex-direction:column; gap:.15rem;
+    position:sticky; top:var(--nav-h); height:calc(100vh - var(--nav-h));
+    overflow-y:auto;
   }
-  .btn-primary { background: var(--accent); color: #fff; }
-  .btn-primary:hover { background: #e63351; transform: translateY(-1px); }
-  .btn-outline { border: 1.5px solid var(--border); background: var(--surface-2); }
-  .btn-outline:hover { border-color: var(--muted); }
-  .btn-ghost { color: var(--muted); }
-  .btn-ghost:hover { color: #fff; background: var(--surface-2); }
+  .side-item{
+    display:flex;align-items:center;gap:.85rem;
+    padding:.6rem .85rem;border-radius:10px;
+    color:var(--muted);font-size:.9rem;font-weight:500;cursor:pointer;transition:.12s;
+  }
+  .side-item i{width:18px;text-align:center}
+  .side-item:hover{background:var(--surface-2);color:#fff}
+  .side-item.active{background:var(--surface-2);color:#fff;border-left:3px solid var(--accent)}
+  .side-divider{height:1px;background:var(--border);margin:.5rem .4rem}
 
-  .avatar {
-    width: 36px; height: 36px; border-radius: 50%;
-    background: linear-gradient(135deg, #2563eb, #7c3aed);
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 700; color: #fff; font-size: .95rem;
-    cursor: pointer; flex-shrink: 0;
-    overflow: hidden;
-  }
-  .avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .main{flex:1;min-width:0;padding:1.25rem 1.5rem 4rem;overflow-y:auto;-webkit-overflow-scrolling:touch}
 
-  /* ========= LAYOUT ========= */
-  .shell { display: flex; flex: 1; min-height: 0; }
-  .sidebar {
-    width: 220px; flex-shrink: 0;
-    padding: 1rem .75rem;
-    border-right: 1px solid var(--border);
-    background: var(--surface);
-    display: flex; flex-direction: column; gap: .25rem;
-    position: sticky; top: 64px; height: calc(100vh - 64px);
-    overflow-y: auto;
+  /* ============ AUTH SCREEN ============ */
+  .auth-screen{min-height:calc(100vh - var(--nav-h));display:flex;align-items:center;justify-content:center;padding:1.5rem 1rem}
+  .auth-card{
+    width:100%;max-width:420px;background:var(--surface);
+    border:1px solid var(--border);border-radius:22px;padding:1.75rem;
+    box-shadow:0 30px 60px -20px rgba(0,0,0,.7);
   }
-  .side-item {
-    display: flex; align-items: center; gap: .85rem;
-    padding: .65rem .9rem; border-radius: 10px;
-    color: var(--muted); font-size: .92rem; font-weight: 500;
-    cursor: pointer; transition: .12s;
+  .auth-tabs{display:flex;gap:.2rem;margin-bottom:1.5rem;background:var(--surface-2);padding:.3rem;border-radius:40px}
+  .auth-tab{flex:1;padding:.6rem;border-radius:40px;color:var(--muted);font-weight:600;font-size:.9rem;transition:.15s}
+  .auth-tab.active{background:var(--accent);color:#fff}
+  .field{display:flex;flex-direction:column;gap:.35rem;margin-bottom:.85rem}
+  .field label{font-size:.8rem;color:var(--muted);font-weight:500}
+  .field input,.field textarea{
+    background:var(--bg);border:1px solid var(--border);border-radius:12px;
+    padding:.75rem .9rem;outline:none;transition:.15s;font-size:.95rem;width:100%;
   }
-  .side-item i { width: 18px; text-align: center; }
-  .side-item:hover { background: var(--surface-2); color: #fff; }
-  .side-item.active { background: var(--surface-2); color: #fff; border-left: 3px solid var(--accent); }
-  .side-divider { height: 1px; background: var(--border); margin: .6rem .4rem; }
+  .field input:focus,.field textarea:focus{border-color:var(--accent-2);box-shadow:0 0 0 3px rgba(59,130,246,.15)}
+  .auth-submit{width:100%;padding:.85rem;background:var(--accent);color:#fff;border-radius:40px;font-weight:700;font-size:1rem;margin-top:.5rem;transition:.15s}
+  .auth-submit:hover{background:#e63351}
+  .auth-msg{margin-top:.9rem;font-size:.86rem;text-align:center;min-height:1.2em}
+  .auth-msg.error{color:#ff6b81}
+  .auth-msg.ok{color:#4ade80}
 
-  .main {
-    flex: 1; min-width: 0;
-    padding: 1.5rem 1.75rem 3rem;
-    overflow-y: auto;
+  /* ============ PROFILE ============ */
+  .profile-banner{height:110px;border-radius:18px;background:linear-gradient(120deg,#1e3a8a,#7c3aed,#db2777);position:relative;margin-bottom:-36px}
+  .profile-head{display:flex;align-items:flex-end;gap:1.2rem;padding:0 1rem;position:relative;z-index:2;flex-wrap:wrap}
+  .avatar-xl{
+    width:100px;height:100px;border-radius:50%;
+    background:linear-gradient(135deg,#2563eb,#7c3aed);
+    display:flex;align-items:center;justify-content:center;
+    font-size:2.2rem;font-weight:800;color:#fff;
+    border:5px solid var(--bg);overflow:hidden;
   }
+  .avatar-xl img{width:100%;height:100%;object-fit:cover}
+  .profile-meta{padding-bottom:.4rem;min-width:0}
+  .profile-meta h1{font-size:1.5rem;letter-spacing:-.02em;margin-bottom:.15rem;word-break:break-word}
+  .profile-meta .username{color:var(--muted);font-size:.9rem;margin-bottom:.4rem}
+  .stats{display:flex;gap:1.2rem;color:var(--muted);font-size:.85rem;flex-wrap:wrap}
+  .stats b{color:#fff;font-weight:700}
 
-  /* ========= AUTH SCREEN ========= */
-  .auth-screen {
-    min-height: calc(100vh - 64px);
-    display: flex; align-items: center; justify-content: center;
-    padding: 2rem 1rem;
+  /* ============ UPLOAD PANEL ============ */
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.1rem 1.2rem;margin-top:1.25rem}
+  .panel h2{font-size:1rem;margin-bottom:.85rem;display:flex;align-items:center;gap:.5rem}
+  .panel h2 i{color:var(--accent)}
+  .upload-row{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+  .file-btn{
+    display:inline-flex;align-items:center;gap:.5rem;padding:.55rem .9rem;border-radius:40px;
+    background:var(--surface-2);border:1px dashed var(--border);font-size:.85rem;font-weight:600;cursor:pointer;
   }
-  .auth-card {
-    width: 100%; max-width: 420px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    padding: 2rem;
-    box-shadow: 0 30px 60px -20px rgba(0,0,0,.7);
-  }
-  .auth-tabs {
-    display: flex; gap: .25rem; margin-bottom: 1.75rem;
-    background: var(--surface-2); padding: .3rem; border-radius: 40px;
-  }
-  .auth-tab {
-    flex: 1; padding: .65rem; border-radius: 40px;
-    color: var(--muted); font-weight: 600; font-size: .9rem;
-    transition: .15s;
-  }
-  .auth-tab.active { background: var(--accent); color: #fff; }
-  .field { display: flex; flex-direction: column; gap: .4rem; margin-bottom: 1rem; }
-  .field label { font-size: .82rem; color: var(--muted); font-weight: 500; }
-  .field input, .field textarea {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: .8rem 1rem;
-    outline: none;
-    transition: .15s;
-  }
-  .field input:focus, .field textarea:focus {
-    border-color: var(--accent-2);
-    box-shadow: 0 0 0 3px rgba(59,130,246,.15);
-  }
-  .auth-submit {
-    width: 100%; padding: .85rem;
-    background: var(--accent); color: #fff;
-    border-radius: 40px; font-weight: 700; font-size: 1rem;
-    margin-top: .5rem; transition: .15s;
-  }
-  .auth-submit:hover { background: #e63351; }
-  .auth-msg { margin-top: 1rem; font-size: .88rem; text-align: center; }
-  .auth-msg.error { color: #ff6b81; }
-  .auth-msg.ok { color: #4ade80; }
+  .file-btn:hover{border-color:var(--accent)}
+  .file-name{font-size:.82rem;color:var(--muted);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-  /* ========= PROFILE ========= */
-  .profile-banner {
-    height: 140px; border-radius: 20px;
-    background: linear-gradient(120deg, #1e3a8a, #7c3aed, #db2777);
-    position: relative; margin-bottom: -40px;
+  /* ============ VIDEO GRID ============ */
+  .grid-title{display:flex;align-items:center;justify-content:space-between;margin:1.5rem 0 .85rem;gap:.5rem}
+  .grid-title h2{font-size:1.15rem}
+  .video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.1rem}
+  .video-card{
+    background:var(--surface);border-radius:var(--radius);overflow:hidden;
+    border:1px solid var(--border);transition:.18s ease;cursor:pointer;display:flex;flex-direction:column;
   }
-  .profile-head {
-    display: flex; align-items: flex-end; gap: 1.5rem;
-    padding: 0 1.5rem; position: relative; z-index: 2;
-    flex-wrap: wrap;
+  .video-card:hover{transform:translateY(-3px);border-color:#3b4a5e;box-shadow:0 18px 30px -14px #000}
+  .thumb{aspect-ratio:16/9;background:#0c0e12;display:flex;align-items:center;justify-content:center;position:relative;color:#4b5a6e;font-size:2rem;overflow:hidden}
+  .thumb img,.thumb video{width:100%;height:100%;object-fit:cover}
+  .thumb .play-overlay{
+    position:absolute;inset:0;background:rgba(0,0,0,.35);
+    display:flex;align-items:center;justify-content:center;opacity:0;transition:.15s;
   }
-  .avatar-xl {
-    width: 120px; height: 120px; border-radius: 50%;
-    background: linear-gradient(135deg, #2563eb, #7c3aed);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 2.8rem; font-weight: 800; color: #fff;
-    border: 5px solid var(--bg); overflow: hidden;
+  .video-card:hover .play-overlay{opacity:1}
+  .thumb .play-overlay i{font-size:2.4rem;color:#fff}
+  .card-body{padding:.85rem .9rem 1rem;display:flex;flex-direction:column;flex:1}
+  .card-title{font-weight:600;font-size:.95rem;margin-bottom:.25rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
+  .card-sub{color:var(--muted);font-size:.78rem;margin-bottom:.55rem}
+  .card-actions{display:flex;align-items:center;gap:.35rem;flex-wrap:wrap;margin-top:auto}
+  .act-btn{
+    display:inline-flex;align-items:center;gap:.3rem;padding:.32rem .6rem;border-radius:30px;
+    font-size:.78rem;color:var(--muted);background:var(--surface-2);transition:.12s;
   }
-  .avatar-xl img { width: 100%; height: 100%; object-fit: cover; }
-  .profile-meta { padding-bottom: .5rem; }
-  .profile-meta h1 { font-size: 1.9rem; letter-spacing: -.02em; margin-bottom: .2rem; }
-  .profile-meta .username { color: var(--muted); font-size: .95rem; margin-bottom: .5rem; }
-  .stats { display: flex; gap: 1.5rem; color: var(--muted); font-size: .92rem; flex-wrap: wrap; }
-  .stats b { color: #fff; font-weight: 700; }
+  .act-btn:hover{color:#fff;background:#2a303c}
+  .act-btn.liked{color:var(--accent)}
+  .act-btn.liked i{color:var(--accent)}
 
-  /* ========= UPLOAD PANEL ========= */
-  .panel {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.25rem 1.5rem;
-    margin-top: 1.5rem;
+  /* ============ COMMENTS IN CARD ============ */
+  .comments{margin-top:.7rem;border-top:1px solid var(--border);padding-top:.7rem;display:none}
+  .comments.open{display:block}
+  .comment-form{display:flex;gap:.4rem;margin-bottom:.55rem}
+  .comment-form input{
+    flex:1;min-width:0;background:var(--bg);border:1px solid var(--border);
+    border-radius:30px;padding:.45rem .8rem;outline:none;font-size:.82rem;
   }
-  .panel h2 { font-size: 1.1rem; margin-bottom: 1rem; display: flex; align-items: center; gap: .5rem; }
-  .panel h2 i { color: var(--accent); }
-  .upload-row { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; }
-  .file-btn {
-    display: inline-flex; align-items: center; gap: .5rem;
-    padding: .6rem 1rem; border-radius: 40px;
-    background: var(--surface-2); border: 1px dashed var(--border);
-    font-size: .88rem; font-weight: 600; cursor: pointer;
-  }
-  .file-btn:hover { border-color: var(--accent); }
-  .file-name { font-size: .85rem; color: var(--muted); max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .comment-form input:focus{border-color:var(--accent-2)}
+  .comment-form button{width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;flex-shrink:0}
+  .comment-list{max-height:160px;overflow-y:auto;display:flex;flex-direction:column;gap:.35rem}
+  .comment-item{background:var(--bg);padding:.45rem .7rem;border-radius:10px;font-size:.8rem;border-left:2px solid var(--accent-2);word-break:break-word}
+  .comment-item b{color:#fff;margin-right:.3rem}
 
-  /* ========= VIDEO GRID ========= */
-  .grid-title {
-    display: flex; align-items: center; justify-content: space-between;
-    margin: 2rem 0 1rem;
-  }
-  .grid-title h2 { font-size: 1.25rem; }
-  .video-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.4rem;
-  }
-  .video-card {
-    background: var(--surface);
-    border-radius: var(--radius);
-    overflow: hidden;
-    border: 1px solid var(--border);
-    transition: .18s ease;
-    cursor: pointer;
-  }
-  .video-card:hover { transform: translateY(-3px); border-color: #3b4a5e; box-shadow: 0 18px 30px -14px #000; }
-  .thumb {
-    aspect-ratio: 16/9; background: #0c0e12;
-    display: flex; align-items: center; justify-content: center;
-    position: relative; color: #4b5a6e; font-size: 2.2rem;
-    overflow: hidden;
-  }
-  .thumb img, .thumb video { width: 100%; height: 100%; object-fit: cover; }
-  .thumb .play-overlay {
-    position: absolute; inset: 0;
-    background: rgba(0,0,0,.35);
-    display: flex; align-items: center; justify-content: center;
-    opacity: 0; transition: .15s;
-  }
-  .video-card:hover .play-overlay { opacity: 1; }
-  .thumb .play-overlay i { font-size: 2.6rem; color: #fff; }
-  .card-body { padding: .9rem 1rem 1.1rem; }
-  .card-title {
-    font-weight: 600; font-size: .98rem; margin-bottom: .3rem;
-    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  .card-sub { color: var(--muted); font-size: .82rem; margin-bottom: .65rem; }
-  .card-actions { display: flex; align-items: center; gap: .4rem; flex-wrap: wrap; }
-  .act-btn {
-    display: inline-flex; align-items: center; gap: .35rem;
-    padding: .35rem .65rem; border-radius: 30px;
-    font-size: .82rem; color: var(--muted);
-    background: var(--surface-2);
-    transition: .12s;
-  }
-  .act-btn:hover { color: #fff; background: #2a303c; }
-  .act-btn.liked { color: var(--accent); }
-  .act-btn.liked i { color: var(--accent); }
+  /* ============ EMPTY ============ */
+  .empty{padding:2.5rem 1rem;text-align:center;background:var(--surface);border:1px dashed var(--border);border-radius:var(--radius);color:var(--muted);margin-top:1rem}
+  .empty i{font-size:2.4rem;margin-bottom:.6rem;color:#2d3a4e;display:block}
 
-  /* ========= COMMENTS ========= */
-  .comments { margin-top: .8rem; border-top: 1px solid var(--border); padding-top: .8rem; display: none; }
-  .comments.open { display: block; }
-  .comment-form { display: flex; gap: .4rem; margin-bottom: .6rem; }
-  .comment-form input {
-    flex: 1; background: var(--bg); border: 1px solid var(--border);
-    border-radius: 30px; padding: .5rem .9rem; outline: none; font-size: .85rem;
+  /* ============ SHORT VIDEO PLAYER MODAL ============ */
+  .modal-bg{
+    position:fixed;inset:0;background:rgba(0,0,0,.92);backdrop-filter:blur(6px);
+    display:flex;align-items:center;justify-content:center;
+    z-index:100;visibility:hidden;opacity:0;transition:.2s;
+    padding:0;
   }
-  .comment-form input:focus { border-color: var(--accent-2); }
-  .comment-form button {
-    width: 36px; height: 36px; border-radius: 50%;
-    background: var(--accent); color: #fff; flex-shrink: 0;
+  .modal-bg.active{visibility:visible;opacity:1}
+  .short-player{
+    width:100%;max-width:460px;height:100vh;max-height:100vh;
+    background:#000;position:relative;display:flex;flex-direction:column;
+    overflow:hidden;
   }
-  .comment-list { max-height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: .4rem; }
-  .comment-item {
-    background: var(--bg); padding: .5rem .8rem; border-radius: 12px;
-    font-size: .82rem; border-left: 2px solid var(--accent-2);
+  .short-player .close{
+    position:absolute;top:calc(.75rem + var(--safe-t));right:.75rem;
+    width:38px;height:38px;border-radius:50%;
+    background:rgba(0,0,0,.6);color:#fff;
+    display:flex;align-items:center;justify-content:center;z-index:5;
   }
-  .comment-item b { color: #fff; margin-right: .35rem; }
+  .short-player .close:hover{background:var(--accent)}
+  .short-video-wrap{
+    flex:1;min-height:0;position:relative;
+    display:flex;align-items:center;justify-content:center;
+    background:#000;overflow:hidden;
+  }
+  .short-video-wrap video{width:100%;height:100%;object-fit:contain;background:#000}
+  .short-overlay{
+    position:absolute;bottom:0;left:0;right:0;
+    padding:1rem 1rem calc(1rem + var(--safe-b));
+    background:linear-gradient(to top,rgba(0,0,0,.85),transparent);
+    z-index:3;display:flex;flex-direction:column;gap:.75rem;
+  }
+  .short-title{font-weight:700;font-size:1rem;line-height:1.35;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6);word-break:break-word}
+  .short-meta{color:#cfd9e6;font-size:.8rem}
+  .short-actions{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}
+  .short-actions .act-btn{background:rgba(255,255,255,.12);color:#fff;backdrop-filter:blur(6px);font-size:.82rem}
+  .short-actions .act-btn:hover{background:rgba(255,255,255,.22)}
+  .short-actions .act-btn.liked{color:var(--accent);background:rgba(255,59,92,.18)}
+  .short-comments{
+    background:var(--surface);border-radius:16px 16px 0 0;
+    max-height:38vh;display:none;flex-direction:column;
+    border-top:1px solid var(--border);
+  }
+  .short-comments.open{display:flex}
+  .short-comments .comment-form{padding:.7rem .8rem;border-bottom:1px solid var(--border);margin:0}
+  .short-comments .comment-list{padding:.6rem .8rem calc(.6rem + var(--safe-b));overflow-y:auto}
 
-  /* ========= EMPTY ========= */
-  .empty {
-    padding: 3rem 1rem; text-align: center;
-    background: var(--surface); border: 1px dashed var(--border);
-    border-radius: var(--radius); color: var(--muted);
-    margin-top: 1rem;
+  /* ============ TOAST ============ */
+  .toast{
+    position:fixed;bottom:calc(1.25rem + var(--safe-b));left:50%;
+    transform:translateX(-50%) translateY(150%);
+    background:#1f242e;border:1px solid var(--border);
+    padding:.7rem 1.2rem;border-radius:40px;font-size:.88rem;
+    z-index:500;transition:.3s ease;box-shadow:0 15px 30px -10px #000;
+    max-width:90vw;text-align:center;word-break:break-word;
   }
-  .empty i { font-size: 2.6rem; margin-bottom: .8rem; color: #2d3a4e; }
+  .toast.show{transform:translateX(-50%) translateY(0)}
+  .toast.ok{border-color:#22c55e}
+  .toast.err{border-color:var(--accent)}
 
-  /* ========= VIDEO PLAYER MODAL ========= */
-  .modal-bg {
-    position: fixed; inset: 0; background: rgba(0,0,0,.8);
-    backdrop-filter: blur(4px);
-    display: flex; align-items: center; justify-content: center;
-    padding: 1.5rem; z-index: 100; visibility: hidden; opacity: 0;
-    transition: .2s;
+  /* ============ RESPONSIVE ============ */
+  @media (max-width:1100px){
+    .video-grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
   }
-  .modal-bg.active { visibility: visible; opacity: 1; }
-  .player-card {
-    background: var(--surface);
-    border-radius: 20px;
-    width: 100%; max-width: 980px;
-    max-height: 92vh; overflow-y: auto;
-    border: 1px solid var(--border);
-    position: relative;
+  @media (max-width:900px){
+    .sidebar{display:none}
+    .main{padding:1rem 1rem calc(4rem + var(--safe-b))}
+    .search-wrap{max-width:100%}
   }
-  .player-card .close {
-    position: absolute; top: 1rem; right: 1rem;
-    width: 38px; height: 38px; border-radius: 50%;
-    background: rgba(0,0,0,.6); color: #fff;
-    display: flex; align-items: center; justify-content: center;
-    z-index: 3;
+  @media (max-width:640px){
+    :root{--nav-h:58px}
+    .topnav{padding:0 .5rem;gap:.4rem}
+    .brand .logo-text{display:none}
+    .btn span{display:none}
+    .btn{padding:.5rem .7rem}
+    .search-wrap input{padding:.5rem .7rem;font-size:.88rem}
+    .search-wrap button{padding:.5rem .75rem}
+    .profile-head{flex-direction:column;align-items:flex-start;gap:.75rem}
+    .avatar-xl{width:84px;height:84px;font-size:1.9rem}
+    .profile-meta h1{font-size:1.35rem}
+    .video-grid{grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:.75rem}
+    .card-body{padding:.65rem .7rem .8rem}
+    .card-title{font-size:.88rem}
+    .card-sub{font-size:.72rem}
+    .act-btn{font-size:.72rem;padding:.28rem .5rem}
+    .short-player{max-width:100vw}
   }
-  .player-card .close:hover { background: var(--accent); }
-  .player-video { aspect-ratio: 16/9; background: #000; border-radius: 20px 20px 0 0; overflow: hidden; }
-  .player-video video { width: 100%; height: 100%; object-fit: contain; background: #000; }
-  .player-info { padding: 1.25rem 1.5rem 1.75rem; }
-  .player-info h2 { font-size: 1.25rem; margin-bottom: .4rem; }
-  .player-info .meta { color: var(--muted); font-size: .88rem; margin-bottom: 1rem; }
-  .player-actions { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
-
-  /* ========= TOAST ========= */
-  .toast {
-    position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(150%);
-    background: #1f242e; border: 1px solid var(--border);
-    padding: .8rem 1.4rem; border-radius: 40px;
-    font-size: .9rem; z-index: 500; transition: .3s ease;
-    box-shadow: 0 15px 30px -10px #000;
-  }
-  .toast.show { transform: translateX(-50%) translateY(0); }
-  .toast.ok { border-color: #22c55e; }
-  .toast.err { border-color: var(--accent); }
-
-  /* ========= RESPONSIVE ========= */
-  @media (max-width: 900px) {
-    .sidebar { display: none; }
-    .main { padding: 1.25rem 1rem 3rem; }
-    .search-wrap { max-width: 100%; }
-  }
-  @media (max-width: 600px) {
-    .topnav { padding: 0 .75rem; height: 58px; }
-    .brand .logo-text { display: none; }
-    .btn span { display: none; }
-    .btn { padding: .55rem .8rem; }
-    .profile-head { flex-direction: column; align-items: flex-start; }
-    .avatar-xl { width: 90px; height: 90px; font-size: 2.2rem; }
-    .profile-meta h1 { font-size: 1.5rem; }
+  @media (max-width:400px){
+    .video-grid{grid-template-columns:1fr 1fr;gap:.6rem}
   }
 </style>
 </head>
@@ -386,7 +295,7 @@
     <div class="logo-text">Free<span>Time</span></div>
   </a>
 
-  <div class="search-wrap" id="searchWrap">
+  <div class="search-wrap">
     <input type="text" id="searchInput" placeholder="Search videos…" autocomplete="off">
     <button id="searchBtn" title="Search"><i class="fas fa-search"></i></button>
   </div>
@@ -406,31 +315,29 @@
 <!-- ================= APP SHELL ================= -->
 <div class="shell">
 
-  <!-- ===== SIDEBAR ===== -->
+  <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
     <div class="side-item active" data-nav="home"><i class="fas fa-house"></i> Home</div>
     <div class="side-item" data-nav="trending"><i class="fas fa-fire"></i> Trending</div>
     <div class="side-item" data-nav="subscriptions"><i class="fas fa-users"></i> Subscriptions</div>
     <div class="side-divider"></div>
-    <div class="side-item" data-nav="profile"><i class="fas fa-user"></i> My Profile</div>
     <div class="side-item" data-nav="myvideos"><i class="fas fa-video"></i> My Videos</div>
     <div class="side-item" data-nav="liked"><i class="fas fa-heart"></i> Liked Videos</div>
     <div class="side-divider"></div>
     <div class="side-item" data-nav="about"><i class="fas fa-circle-info"></i> About</div>
   </aside>
 
-  <!-- ===== MAIN ===== -->
+  <!-- MAIN -->
   <main class="main" id="main">
 
-    <!-- AUTH SCREEN -->
+    <!-- AUTH -->
     <div id="authScreen" class="auth-screen">
       <div class="auth-card">
         <div class="auth-tabs">
-          <button class="auth-tab active" data-tab="signin" id="tabSignIn">Sign in</button>
-          <button class="auth-tab" data-tab="signup" id="tabSignUp">Sign up</button>
+          <button class="auth-tab active" id="tabSignIn">Sign in</button>
+          <button class="auth-tab" id="tabSignUp">Sign up</button>
         </div>
 
-        <!-- Sign In -->
         <form id="formSignIn" class="auth-form">
           <div class="field">
             <label>Email</label>
@@ -444,7 +351,6 @@
           <div class="auth-msg" id="signInMsg"></div>
         </form>
 
-        <!-- Sign Up -->
         <form id="formSignUp" class="auth-form hidden">
           <div class="field">
             <label>Username</label>
@@ -464,10 +370,9 @@
       </div>
     </div>
 
-    <!-- APP CONTENT (shown after login) -->
+    <!-- APP -->
     <div id="appContent" class="hidden">
 
-      <!-- ===== PROFILE HEAD ===== -->
       <div id="profileHead">
         <div class="profile-banner"></div>
         <div class="profile-head">
@@ -485,28 +390,24 @@
         </div>
       </div>
 
-      <!-- ===== UPLOAD PANEL ===== -->
       <div class="panel" id="uploadPanel">
         <h2><i class="fas fa-cloud-upload-alt"></i> Upload a new video</h2>
-        <div class="field" style="margin-bottom:.75rem">
+        <div class="field">
           <label>Title</label>
           <input type="text" id="uploadTitle" placeholder="Give your video a title…" maxlength="200">
         </div>
-        <div class="field" style="margin-bottom:.75rem">
+        <div class="field">
           <label>Description (optional)</label>
           <textarea id="uploadDesc" rows="2" placeholder="Tell viewers about your video…" maxlength="2000"></textarea>
         </div>
         <div class="upload-row">
-          <label class="file-btn" for="videoFile">
-            <i class="fas fa-folder-open"></i> Choose video
-          </label>
+          <label class="file-btn" for="videoFile"><i class="fas fa-folder-open"></i> Choose video</label>
           <input type="file" id="videoFile" accept="video/*" class="hidden">
           <span class="file-name" id="fileName">No file selected</span>
           <button class="btn btn-primary" id="uploadBtn"><i class="fas fa-arrow-up"></i> Upload</button>
         </div>
       </div>
 
-      <!-- ===== VIDEO GRID ===== -->
       <div class="grid-title">
         <h2 id="feedTitle">My Videos</h2>
         <span class="muted" id="feedCount">0 videos</span>
@@ -521,24 +422,26 @@
   </main>
 </div>
 
-<!-- ================= VIDEO PLAYER MODAL ================= -->
+<!-- ================= SHORT VIDEO PLAYER MODAL ================= -->
 <div class="modal-bg" id="playerModal">
-  <div class="player-card">
+  <div class="short-player">
     <button class="close" id="playerClose"><i class="fas fa-times"></i></button>
-    <div class="player-video">
-      <video id="playerVideo" controls playsinline></video>
-    </div>
-    <div class="player-info">
-      <h2 id="playerTitle">Video title</h2>
-      <div class="meta" id="playerMeta"></div>
-      <div class="player-actions" id="playerActions"></div>
-      <div class="comments open" id="playerComments" style="display:block;border-top:1px solid var(--border);padding-top:1rem">
-        <div class="comment-form">
-          <input type="text" id="playerCommentInput" placeholder="Add a comment…">
-          <button id="playerCommentSend"><i class="fas fa-paper-plane"></i></button>
-        </div>
-        <div class="comment-list" id="playerCommentList"></div>
+
+    <div class="short-video-wrap">
+      <video id="playerVideo" controls playsinline preload="metadata"></video>
+      <div class="short-overlay">
+        <div class="short-title" id="playerTitle">Video title</div>
+        <div class="short-meta" id="playerMeta"></div>
+        <div class="short-actions" id="playerActions"></div>
       </div>
+    </div>
+
+    <div class="short-comments" id="playerComments">
+      <div class="comment-form">
+        <input type="text" id="playerCommentInput" placeholder="Add a comment…">
+        <button id="playerCommentSend"><i class="fas fa-paper-plane"></i></button>
+      </div>
+      <div class="comment-list" id="playerCommentList"></div>
     </div>
   </div>
 </div>
@@ -548,29 +451,18 @@
 
 <!-- ================= APP SCRIPT ================= -->
 <script>
-/* =========================================================
-   FREETIME APP
-   Supabase backend (auth + database + storage)
-   ========================================================= */
+/* ============================================================
+   FREETIME APP · Supabase backend
+   ============================================================ */
 const SUPABASE_URL = 'https://riyotfeepgscpjalnekz.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_K0aOpQUQmpiEDQHM1IcEFQ_40EfInwV';
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-/* =========================================================
-   STATE
-   ========================================================= */
-const state = {
-  user: null,          // supabase auth user
-  profile: null,       // public.users row
-  videos: [],          // loaded videos
-  view: 'myvideos',    // current sidebar view
-  search: '',
-};
+/* ---------------- STATE ---------------- */
+const state = { user: null, profile: null, videos: [], view: 'home', search: '' };
 
-/* =========================================================
-   DOM SHORTCUTS
-   ========================================================= */
+/* ---------------- DOM ---------------- */
 const $  = (s) => document.querySelector(s);
 const $$ = (s) => document.querySelectorAll(s);
 
@@ -585,20 +477,14 @@ const feedTitle    = $('#feedTitle');
 const feedCount    = $('#feedCount');
 const toastEl      = $('#toast');
 
-/* =========================================================
-   HELPERS
-   ========================================================= */
+/* ---------------- HELPERS ---------------- */
 function toast(msg, type = 'ok') {
   toastEl.textContent = msg;
   toastEl.className = 'toast show ' + (type === 'err' ? 'err' : 'ok');
   clearTimeout(toast._t);
   toast._t = setTimeout(() => toastEl.className = 'toast', 2600);
 }
-function esc(s = '') {
-  const d = document.createElement('div');
-  d.textContent = s;
-  return d.innerHTML;
-}
+function esc(s = '') { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 function fmtNum(n) {
   n = Number(n) || 0;
   if (n >= 1e9) return (n / 1e9).toFixed(1).replace(/\.0$/, '') + 'B';
@@ -617,21 +503,17 @@ function fmtDate(iso) {
   return d.toLocaleDateString();
 }
 function initials(name = 'FT') {
-  return name.trim().split(/\s+/).map(w => w[0]).slice(0,2).join('').toUpperCase() || 'FT';
+  return name.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase() || 'FT';
 }
 
-/* =========================================================
-   AUTH UI
-   ========================================================= */
+/* ---------------- AUTH UI ---------------- */
 $('#navSignIn').onclick = () => showAuth('signin');
 $('#navSignUp').onclick = () => showAuth('signup');
 $('#navUploadTop').onclick = () => {
+  if (!state.user) return showAuth('signin');
   $('#uploadPanel').scrollIntoView({ behavior: 'smooth' });
 };
-$('#navSignOut').onclick = async () => {
-  await sb.auth.signOut();
-  toast('Signed out');
-};
+$('#navSignOut').onclick = async () => { await sb.auth.signOut(); toast('Signed out'); };
 
 function showAuth(tab) {
   authScreen.classList.remove('hidden');
@@ -648,9 +530,7 @@ function switchTab(tab) {
 $('#tabSignIn').onclick = () => switchTab('signin');
 $('#tabSignUp').onclick = () => switchTab('signup');
 
-/* =========================================================
-   AUTH ACTIONS
-   ========================================================= */
+/* ---------------- SIGN UP ---------------- */
 $('#formSignUp').addEventListener('submit', async (e) => {
   e.preventDefault();
   const email    = $('#signUpEmail').value.trim();
@@ -660,27 +540,23 @@ $('#formSignUp').addEventListener('submit', async (e) => {
   msg.className  = 'auth-msg';
   msg.textContent = 'Creating account…';
 
-  // 1) Create auth user
-  const { data: authData, error: authErr } = await sb.auth.signUp({ email, password });
-  if (authErr) { msg.className = 'auth-msg error'; msg.textContent = authErr.message; return; }
+  const { data, error } = await sb.auth.signUp({
+    email,
+    password,
+    options: { data: { username } }
+  });
 
-  // 2) Create profile row
-  const uid = authData.user?.id;
-  if (uid) {
-    const { error: profErr } = await sb.from('profiles').insert({
-      id: uid,
-      username,
-      email,
-      full_name: username,
-      follower_count: 0,
-    });
-    if (profErr) { msg.className = 'auth-msg error'; msg.textContent = profErr.message; return; }
+  if (error) {
+    msg.className = 'auth-msg error';
+    msg.textContent = error.message;
+    return;
   }
 
   msg.className = 'auth-msg ok';
-  msg.textContent = 'Account created! Check your email to confirm, then sign in.';
+  msg.textContent = 'Account created! You are now signed in.';
 });
 
+/* ---------------- SIGN IN ---------------- */
 $('#formSignIn').addEventListener('submit', async (e) => {
   e.preventDefault();
   const email    = $('#signInEmail').value.trim();
@@ -689,15 +565,13 @@ $('#formSignIn').addEventListener('submit', async (e) => {
   msg.className  = 'auth-msg';
   msg.textContent = 'Signing in…';
 
-  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  const { error } = await sb.auth.signInWithPassword({ email, password });
   if (error) { msg.className = 'auth-msg error'; msg.textContent = error.message; return; }
   msg.className = 'auth-msg ok';
   msg.textContent = 'Welcome back!';
 });
 
-/* =========================================================
-   SESSION / BOOT
-   ========================================================= */
+/* ---------------- SESSION ---------------- */
 sb.auth.onAuthStateChange(async (event, session) => {
   if (session?.user) {
     state.user = session.user;
@@ -720,7 +594,6 @@ async function loadProfile() {
 
   if (error) { console.error('profile load', error); return; }
 
-  // auto-create profile if missing
   if (!data) {
     const meta = state.user.user_metadata || {};
     const username = (meta.username || state.user.email.split('@')[0] || 'user').toLowerCase();
@@ -761,29 +634,22 @@ function exitApp() {
   state.videos = [];
 }
 
-/* =========================================================
-   VIDEO LOADING
-   ========================================================= */
+/* ---------------- VIDEO LOADING ---------------- */
 async function loadVideos() {
   if (!state.user) return;
 
-  let query = sb.from('videos')
-    .select('*')
-    .order('created_at', { ascending: false });
+  let query = sb.from('videos').select('*').order('created_at', { ascending: false });
 
   if (state.view === 'myvideos' || state.view === 'profile') {
     query = query.eq('user_id', state.user.id);
   }
   if (state.view === 'liked') {
-    // get liked video ids
     const { data: likes } = await sb.from('video_likes').select('video_id').eq('user_id', state.user.id);
     const ids = (likes || []).map(l => l.video_id);
-    if (!ids.length) { state.videos = []; renderVideos(); return; }
+    if (!ids.length) { state.videos = []; renderVideos(); renderProfileStats(); return; }
     query = query.in('id', ids);
   }
-  if (state.search) {
-    query = query.ilike('title', `%${state.search}%`);
-  }
+  if (state.search) query = query.ilike('title', `%${state.search}%`);
 
   const { data, error } = await query.limit(60);
   if (error) { console.error(error); toast('Could not load videos', 'err'); return; }
@@ -793,16 +659,15 @@ async function loadVideos() {
   renderProfileStats();
 }
 
-/* =========================================================
-   RENDER: VIDEO GRID
-   ========================================================= */
+/* ---------------- RENDER GRID ---------------- */
 function renderVideos() {
   const vids = state.videos;
 
   feedTitle.textContent =
-    state.view === 'liked'       ? 'Liked Videos' :
-    state.view === 'trending'    ? 'Trending' :
+    state.view === 'liked'         ? 'Liked Videos' :
+    state.view === 'trending'      ? 'Trending' :
     state.view === 'subscriptions' ? 'Subscriptions' :
+    state.view === 'home'          ? 'Home' :
     'My Videos';
   feedCount.textContent = `${vids.length} video${vids.length === 1 ? '' : 's'}`;
 
@@ -814,7 +679,7 @@ function renderVideos() {
   emptyFeed.classList.add('hidden');
 
   videoGrid.innerHTML = vids.map(v => {
-    const liked = v.__liked === true; // local flag set after like toggle
+    const liked = v.__liked === true;
     return `
       <div class="video-card" data-id="${v.id}">
         <div class="thumb">
@@ -832,7 +697,7 @@ function renderVideos() {
               <i class="far fa-comment"></i> <span>${fmtNum(v.comment_count)}</span>
             </button>
             <button class="act-btn share-btn" data-id="${v.id}">
-              <i class="fas fa-share-alt"></i> Share
+              <i class="fas fa-share-alt"></i>
             </button>
           </div>
           <div class="comments" data-comments="${v.id}">
@@ -846,7 +711,6 @@ function renderVideos() {
       </div>`;
   }).join('');
 
-  // attach listeners
   $$('.video-card').forEach(card => {
     card.addEventListener('click', (e) => {
       if (e.target.closest('button, input')) return;
@@ -863,7 +727,11 @@ function renderVideos() {
   $$('.share-btn').forEach(b => b.onclick = (e) => {
     e.stopPropagation();
     const url = `${location.origin}${location.pathname}?v=${b.dataset.id}`;
-    navigator.clipboard?.writeText(url).then(() => toast('Link copied!'), () => toast('Share: ' + url));
+    if (navigator.share) {
+      navigator.share({ title: 'FreeTime video', url }).catch(() => {});
+    } else {
+      navigator.clipboard?.writeText(url).then(() => toast('Link copied!'), () => toast('Share: ' + url));
+    }
   });
   $$('[data-comment-send]').forEach(btn => {
     btn.onclick = (e) => {
@@ -882,15 +750,13 @@ function renderProfileStats() {
   const vids = state.videos;
   const totalViews = vids.reduce((s, v) => s + (v.view_count || 0), 0);
   const totalLikes = vids.reduce((s, v) => s + (v.like_count || 0), 0);
-  $('#statVideos').textContent   = vids.length;
-  $('#statViews').textContent    = fmtNum(totalViews);
-  $('#statLikes').textContent    = fmtNum(totalLikes);
+  $('#statVideos').textContent    = vids.length;
+  $('#statViews').textContent     = fmtNum(totalViews);
+  $('#statLikes').textContent     = fmtNum(totalLikes);
   $('#statFollowers').textContent = fmtNum(state.profile?.follower_count || 0);
 }
 
-/* =========================================================
-   LIKE
-   ========================================================= */
+/* ---------------- LIKE ---------------- */
 async function toggleLike(videoId) {
   if (!state.user) return;
   const already = await sb.from('video_likes')
@@ -903,7 +769,7 @@ async function toggleLike(videoId) {
   } else {
     await sb.from('video_likes').insert({ user_id: state.user.id, video_id: videoId });
   }
-  // refresh video row
+
   const { data } = await sb.from('videos').select('*').eq('id', videoId).maybeSingle();
   if (data) {
     data.__liked = !isLiked;
@@ -913,9 +779,7 @@ async function toggleLike(videoId) {
   renderVideos();
 }
 
-/* =========================================================
-   COMMENTS
-   ========================================================= */
+/* ---------------- COMMENTS ---------------- */
 async function loadComments(videoId) {
   const listEl = document.querySelector(`[data-comment-list="${videoId}"]`);
   if (!listEl) return;
@@ -927,7 +791,7 @@ async function loadComments(videoId) {
   listEl.innerHTML = (data || []).map(c => {
     const name = c.profiles?.full_name || c.profiles?.username || 'User';
     return `<div class="comment-item"><b>${esc(name)}</b>${esc(c.content)}</div>`;
-  }).join('') || `<div class="muted" style="font-size:.82rem">No comments yet.</div>`;
+  }).join('') || `<div class="muted" style="font-size:.8rem">No comments yet.</div>`;
 }
 
 async function submitComment(videoId, input) {
@@ -942,22 +806,19 @@ async function submitComment(videoId, input) {
   if (error) { toast(error.message, 'err'); return; }
   el.value = '';
   await loadComments(videoId);
-  // update comment count locally
   const v = state.videos.find(x => x.id === videoId);
   if (v) v.comment_count = (v.comment_count || 0) + 1;
   renderVideos();
 }
 
-/* =========================================================
-   UPLOAD
-   ========================================================= */
+/* ---------------- UPLOAD ---------------- */
 $('#videoFile').addEventListener('change', (e) => {
   const f = e.target.files[0];
   $('#fileName').textContent = f ? f.name : 'No file selected';
 });
 
 $('#uploadBtn').addEventListener('click', async () => {
-  if (!state.user) return;
+  if (!state.user) return showAuth('signin');
   const file  = $('#videoFile').files[0];
   const title = $('#uploadTitle').value.trim();
   const desc  = $('#uploadDesc').value.trim();
@@ -970,21 +831,18 @@ $('#uploadBtn').addEventListener('click', async () => {
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading…';
 
   try {
-    // 1) upload to storage bucket "videos"
-    const ext = file.name.split('.').pop();
+    const ext  = file.name.split('.').pop();
     const path = `${state.user.id}/${Date.now()}.${ext}`;
     const { error: upErr } = await sb.storage.from('videos').upload(path, file, { upsert: false });
     if (upErr) throw upErr;
 
     const { data: urlData } = sb.storage.from('videos').getPublicUrl(path);
-    const videoUrl = urlData.publicUrl;
 
-    // 2) insert row
     const { error: dbErr } = await sb.from('videos').insert({
       user_id: state.user.id,
       title,
       description: desc || null,
-      video_url: videoUrl,
+      video_url: urlData.publicUrl,
       visibility: 'public',
     });
     if (dbErr) throw dbErr;
@@ -1005,14 +863,13 @@ $('#uploadBtn').addEventListener('click', async () => {
   }
 });
 
-/* =========================================================
-   VIDEO PLAYER MODAL
-   ========================================================= */
+/* ---------------- SHORT PLAYER ---------------- */
 const playerModal  = $('#playerModal');
 const playerVideo  = $('#playerVideo');
 const playerTitle  = $('#playerTitle');
 const playerMeta   = $('#playerMeta');
 const playerActions = $('#playerActions');
+const playerComments = $('#playerComments');
 const playerCommentList = $('#playerCommentList');
 const playerCommentInput = $('#playerCommentInput');
 
@@ -1029,24 +886,26 @@ async function openPlayer(videoId) {
   playerVideo.load();
 
   playerActions.innerHTML = `
-    <button class="act-btn" id="playerLike"><i class="far fa-heart"></i> Like</button>
-    <button class="act-btn" id="playerShare"><i class="fas fa-share-alt"></i> Share</button>
+    <button class="act-btn" id="playerLikeBtn"><i class="far fa-heart"></i> Like</button>
+    <button class="act-btn" id="playerCommentBtn"><i class="far fa-comment"></i> Comments</button>
+    <button class="act-btn" id="playerShareBtn"><i class="fas fa-share-alt"></i> Share</button>
   `;
-  $('#playerLike').onclick = () => toggleLike(videoId);
-  $('#playerShare').onclick = () => {
+  $('#playerLikeBtn').onclick = () => toggleLike(videoId);
+  $('#playerCommentBtn').onclick = () => playerComments.classList.toggle('open');
+  $('#playerShareBtn').onclick = () => {
     const url = `${location.origin}${location.pathname}?v=${videoId}`;
-    navigator.clipboard?.writeText(url).then(() => toast('Link copied!'));
+    if (navigator.share) navigator.share({ title: v.title, url }).catch(() => {});
+    else navigator.clipboard?.writeText(url).then(() => toast('Link copied!'));
   };
 
   await loadComments(videoId);
   playerCommentList.innerHTML = document.querySelector(`[data-comment-list="${videoId}"]`)?.innerHTML || '';
-
+  playerComments.classList.remove('open');
   playerModal.classList.add('active');
 
-  // count view once per session
   if (!sessionStorage.getItem('viewed_' + videoId)) {
     sessionStorage.setItem('viewed_' + videoId, '1');
-    await sb.rpc('increment_view', { vid: videoId }).catch(() => {});
+    sb.rpc('increment_view', { vid: videoId }).catch(() => {});
   }
 }
 
@@ -1069,19 +928,16 @@ playerCommentInput.addEventListener('keydown', async (e) => {
   });
   if (error) { toast(error.message, 'err'); return; }
   playerCommentInput.value = '';
-  const { data } = await sb.from('comments')
-    .select('*, profiles:user_id(username, full_name)')
-    .eq('video_id', currentPlayerId)
-    .order('created_at', { ascending: true });
-  playerCommentList.innerHTML = (data || []).map(c => {
-    const name = c.profiles?.full_name || c.profiles?.username || 'User';
-    return `<div class="comment-item"><b>${esc(name)}</b>${esc(c.content)}</div>`;
-  }).join('') || `<div class="muted" style="font-size:.82rem">No comments yet.</div>`;
+  await loadComments(currentPlayerId);
+  playerCommentList.innerHTML = document.querySelector(`[data-comment-list="${currentPlayerId}"]`)?.innerHTML || '';
 });
 
-/* =========================================================
-   SIDEBAR NAV
-   ========================================================= */
+$('#playerCommentSend').onclick = () => {
+  const ev = new KeyboardEvent('keydown', { key: 'Enter' });
+  playerCommentInput.dispatchEvent(ev);
+};
+
+/* ---------------- SIDEBAR ---------------- */
 $$('.side-item').forEach(item => {
   item.onclick = () => {
     $$('.side-item').forEach(i => i.classList.remove('active'));
@@ -1094,9 +950,7 @@ $$('.side-item').forEach(item => {
   };
 });
 
-/* =========================================================
-   SEARCH
-   ========================================================= */
+/* ---------------- SEARCH ---------------- */
 $('#searchBtn').onclick = () => {
   state.search = $('#searchInput').value.trim();
   if (!state.user) return showAuth('signin');
@@ -1106,9 +960,7 @@ $('#searchInput').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') $('#searchBtn').click();
 });
 
-/* =========================================================
-   BOOT
-   ========================================================= */
+/* ---------------- BOOT ---------------- */
 (async () => {
   const { data: { session } } = await sb.auth.getSession();
   if (session?.user) {

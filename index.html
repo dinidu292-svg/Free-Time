@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0a0a0f">
-<title>FreeTime — Share Your Moments</title>
+<title>FreeTime — Watch, Share, Connect</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -156,7 +156,7 @@
   .auth-msg.error{color:#ff8e9e}
   .auth-msg.ok{color:var(--teal)}
 
-  /* ============ HOME FEED ============ */
+  /* ============ HOME / FEED ============ */
   .feed-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:.75rem}
   .feed-head h1{font-size:1.8rem;font-weight:800;letter-spacing:-.03em}
   .feed-head h1 span{background:linear-gradient(135deg,var(--coral),var(--teal));-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -225,17 +225,6 @@
   .act-btn:hover{color:#fff;background:var(--glass-2);border-color:var(--border-2)}
   .act-btn.liked{color:var(--coral);border-color:rgba(255,107,107,.3);background:rgba(255,107,107,.1)}
   .act-btn.liked i{color:var(--coral)}
-
-  /* ============ COMMENTS IN CARD ============ */
-  .comments{margin-top:.75rem;border-top:1px solid var(--border);padding-top:.75rem;display:none}
-  .comments.open{display:block}
-  .comment-form{display:flex;gap:.4rem;margin-bottom:.6rem}
-  .comment-form input{flex:1;min-width:0;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:30px;padding:.5rem .85rem;outline:none;font-size:.82rem}
-  .comment-form input:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(78,205,196,.1)}
-  .comment-form button{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--coral),var(--coral-2));color:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center}
-  .comment-list{max-height:160px;overflow-y:auto;display:flex;flex-direction:column;gap:.4rem}
-  .comment-item{background:rgba(0,0,0,.3);padding:.5rem .8rem;border-radius:12px;font-size:.8rem;border-left:2px solid var(--teal);word-break:break-word;line-height:1.4}
-  .comment-item b{color:#fff;margin-right:.35rem;font-weight:600}
 
   /* ============ PROFILE ============ */
   .profile-hero{position:relative;border-radius:28px;overflow:hidden;margin-bottom:1.5rem;background:var(--glass);border:1px solid var(--border);backdrop-filter:blur(20px)}
@@ -318,6 +307,17 @@
   @keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
   .short-comments .comment-form{padding:.85rem 1rem;border-bottom:1px solid var(--border);margin:0}
   .short-comments .comment-list{padding:.75rem 1rem calc(.75rem + var(--safe-b));overflow-y:auto}
+
+  /* ============ COMMENTS INLINE ============ */
+  .comments{margin-top:.75rem;border-top:1px solid var(--border);padding-top:.75rem;display:none}
+  .comments.open{display:block}
+  .comment-form{display:flex;gap:.4rem;margin-bottom:.6rem}
+  .comment-form input{flex:1;min-width:0;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:30px;padding:.5rem .85rem;outline:none;font-size:.82rem}
+  .comment-form input:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(78,205,196,.1)}
+  .comment-form button{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--coral),var(--coral-2));color:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+  .comment-list{max-height:160px;overflow-y:auto;display:flex;flex-direction:column;gap:.4rem}
+  .comment-item{background:rgba(0,0,0,.3);padding:.5rem .8rem;border-radius:12px;font-size:.8rem;border-left:2px solid var(--teal);word-break:break-word;line-height:1.4}
+  .comment-item b{color:#fff;margin-right:.35rem;font-weight:600}
 
   /* ============ TOAST ============ */
   .toast{position:fixed;bottom:calc(1.5rem + var(--safe-b));left:50%;transform:translateX(-50%) translateY(150%);background:rgba(18,18,26,.95);backdrop-filter:blur(20px);border:1px solid var(--border-2);padding:.8rem 1.4rem;border-radius:40px;font-size:.88rem;font-weight:500;z-index:500;transition:.3s cubic-bezier(.34,1.56,.64,1);box-shadow:0 20px 40px -10px rgba(0,0,0,.8);max-width:90vw;text-align:center;word-break:break-word}
@@ -402,13 +402,11 @@
   <aside class="sidebar" id="sidebar">
     <div class="side-label">Discover</div>
     <div class="side-item active" data-nav="home"><i class="fas fa-house"></i> Home</div>
-    <div class="side-item" data-nav="trending"><i class="fas fa-fire"></i> Trending</div>
     <div class="side-item" data-nav="subscriptions"><i class="fas fa-users"></i> Subscriptions</div>
     <div class="side-divider"></div>
     <div class="side-label">Your Space</div>
     <div class="side-item" data-nav="profile"><i class="fas fa-user"></i> My Profile</div>
     <div class="side-item" data-nav="myvideos"><i class="fas fa-video"></i> My Videos</div>
-    <div class="side-item" data-nav="liked"><i class="fas fa-heart"></i> Liked</div>
     <div class="side-divider"></div>
     <div class="side-item" data-nav="about"><i class="fas fa-circle-info"></i> About</div>
   </aside>
@@ -510,7 +508,18 @@
             <label>Description (optional)</label>
             <textarea id="uploadDesc" rows="2" placeholder="Tell viewers about your video…" maxlength="2000"></textarea>
           </div>
-          <div class="upload-row">
+          
+          <!-- THUMBNAIL UPLOAD ROW -->
+          <div class="field">
+            <label>Thumbnail (optional)</label>
+            <div class="upload-row" style="margin-top:0;">
+              <label class="file-btn" for="thumbFile"><i class="fas fa-image"></i> Choose thumbnail</label>
+              <input type="file" id="thumbFile" accept="image/*" class="hidden">
+              <span class="file-name" id="thumbName">No image selected</span>
+            </div>
+          </div>
+
+          <div class="upload-row" style="margin-top:1rem;">
             <label class="file-btn" for="videoFile"><i class="fas fa-folder-open"></i> Choose video</label>
             <input type="file" id="videoFile" accept="video/*" class="hidden">
             <span class="file-name" id="fileName">No file selected</span>
@@ -606,12 +615,9 @@ const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const state = {
-  user: null,
-  profile: null,
-  homeVideos: [],
-  myVideos: [],
-  creatorVideos: [],
-  currentCreator: null,     // profile row of the creator being viewed
+  user: null, profile: null,
+  homeVideos: [], myVideos: [], subVideos: [], creatorVideos: [],
+  currentCreator: null,
   currentPage: 'home',
   search: '',
   likedIds: new Set(),
@@ -652,9 +658,7 @@ function initials(name = 'FT') {
   return name.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase() || 'FT';
 }
 
-/* ============================================================
-   AUTH UI
-   ============================================================ */
+/* AUTH UI */
 $('#navSignIn').onclick = () => showAuth('signin');
 $('#navSignUp').onclick = () => showAuth('signup');
 $('#navUploadTop').onclick = () => {
@@ -699,9 +703,7 @@ $('#formSignIn').addEventListener('submit', async (e) => {
   msg.className = 'auth-msg ok'; msg.textContent = 'Welcome back!';
 });
 
-/* ============================================================
-   SESSION
-   ============================================================ */
+/* SESSION */
 sb.auth.onAuthStateChange(async (event, session) => {
   if (session?.user) {
     state.user = session.user;
@@ -709,7 +711,7 @@ sb.auth.onAuthStateChange(async (event, session) => {
     await enterApp();
   } else {
     state.user = null; state.profile = null;
-    state.homeVideos = []; state.myVideos = []; state.creatorVideos = [];
+    state.homeVideos = []; state.myVideos = []; state.subVideos = []; state.creatorVideos = [];
     state.likedIds = new Set(); state.subscriptions = new Set();
     exitApp();
   }
@@ -742,7 +744,6 @@ async function enterApp() {
   $('#profileBio').textContent = p.bio || '';
   navAvatar.textContent = initials(name);
 
-  // load likes + subscriptions once
   const [likesRes, subsRes] = await Promise.all([
     sb.from('video_likes').select('video_id').eq('user_id', state.user.id),
     sb.from('subscriptions').select('channel_id').eq('subscriber_id', state.user.id),
@@ -752,6 +753,7 @@ async function enterApp() {
 
   await loadHomeFeed();
   await loadMyVideos();
+  await loadSubFeed();
   renderProfileStats();
   goTo('home');
   startRealtime();
@@ -763,9 +765,7 @@ function exitApp() {
   if (window._realtimeChannel) { sb.removeChannel(window._realtimeChannel); window._realtimeChannel = null; }
 }
 
-/* ============================================================
-   NAVIGATION
-   ============================================================ */
+/* NAVIGATION */
 function goTo(page) {
   state.currentPage = page;
   ['home', 'profile', 'creator'].forEach(p => {
@@ -779,13 +779,17 @@ function goTo(page) {
   const navItem = document.querySelector(`.side-item[data-nav="${page}"]`);
   if (navItem) navItem.classList.add('active');
 
-  if (page === 'home') loadHomeFeed();
+  if (page === 'home') {
+    if (state.currentPage === 'subscriptions') {
+      renderSubFeed();
+    } else {
+      loadHomeFeed();
+    }
+  }
   if (page === 'profile') loadMyVideos();
 }
 
-/* ============================================================
-   LOAD DATA
-   ============================================================ */
+/* LOAD DATA */
 async function loadHomeFeed() {
   const { data, error } = await sb.from('videos')
     .select('*, profiles:user_id(id, username, full_name, avatar_url, follower_count)')
@@ -816,13 +820,22 @@ async function loadMyVideos() {
   renderProfileStats();
 }
 
+async function loadSubFeed() {
+  if (!state.subscriptions.size) { state.subVideos = []; return; }
+  const { data, error } = await sb.from('videos')
+    .select('*, profiles:user_id(id, username, full_name, avatar_url, follower_count)')
+    .in('user_id', Array.from(state.subscriptions))
+    .eq('visibility', 'public')
+    .order('created_at', { ascending: false })
+    .limit(60);
+  if (!error) state.subVideos = data || [];
+}
+
 async function loadCreatorProfile(userId) {
-  // fetch creator profile
   const { data: prof, error: pErr } = await sb.from('profiles').select('*').eq('id', userId).maybeSingle();
   if (pErr || !prof) { toast('Creator not found', 'err'); return; }
   state.currentCreator = prof;
 
-  // fetch their videos
   const { data: vids } = await sb.from('videos')
     .select('*')
     .eq('user_id', userId)
@@ -834,9 +847,7 @@ async function loadCreatorProfile(userId) {
   goTo('creator');
 }
 
-/* ============================================================
-   RENDER
-   ============================================================ */
+/* RENDER */
 function renderCreatorStrip() {
   const map = new Map();
   state.homeVideos.forEach(v => {
@@ -871,6 +882,22 @@ function renderHomeFeed() {
   attachCardEvents($('#homeVideoGrid'), vids);
 }
 
+function renderSubFeed() {
+  $('#pageHome').classList.remove('hidden');
+  $('#homeFeedCount').textContent = `${state.subVideos.length} videos`;
+  $('#homeFeedTitle').textContent = 'Subscriptions';
+  
+  if (!state.subVideos.length) {
+    $('#homeVideoGrid').innerHTML = '';
+    $('#homeEmpty').classList.remove('hidden');
+    $('#homeEmpty').querySelector('p').textContent = 'No videos from subscriptions yet.';
+    return;
+  }
+  $('#homeEmpty').classList.add('hidden');
+  $('#homeVideoGrid').innerHTML = state.subVideos.map(v => videoCardHTML(v, true)).join('');
+  attachCardEvents($('#homeVideoGrid'), state.subVideos);
+}
+
 function renderMyVideos() {
   const vids = state.myVideos;
   $('#myVideoCount').textContent = `${vids.length} video${vids.length === 1 ? '' : 's'}`;
@@ -900,7 +927,6 @@ function renderCreatorPage() {
   $('#creatorFeedCount').textContent = `${vids.length} video${vids.length === 1 ? '' : 's'}`;
   $('#creatorFeedTitle').textContent = `${name}'s videos`;
 
-  // subscribe button
   const isSubscribed = state.subscriptions.has(c.id);
   const subBtn = $('#subscribeBtn');
   subBtn.textContent = isSubscribed ? 'Subscribed' : 'Subscribe';
@@ -1001,9 +1027,7 @@ function renderProfileStats() {
   $('#statFollowers').textContent = fmtNum(state.profile?.follower_count || 0);
 }
 
-/* ============================================================
-   LIKE
-   ============================================================ */
+/* LIKE */
 async function toggleLike(videoId) {
   if (!state.user) return;
   const liked = state.likedIds.has(videoId);
@@ -1014,21 +1038,23 @@ async function toggleLike(videoId) {
     await sb.from('video_likes').insert({ user_id: state.user.id, video_id: videoId });
     state.likedIds.add(videoId);
   }
-  // refresh from db
   const { data } = await sb.from('videos').select('*').eq('id', videoId).maybeSingle();
   if (data) {
-    ['homeVideos', 'myVideos', 'creatorVideos'].forEach(k => {
+    ['homeVideos', 'myVideos', 'subVideos', 'creatorVideos'].forEach(k => {
       const idx = state[k].findIndex(v => v.id === videoId);
       if (idx > -1) state[k][idx] = data;
     });
   }
-  renderHomeFeed(); renderMyVideos();
+  if (state.currentPage === 'home') {
+    if (state.search) renderHomeFeed();
+    else if (document.querySelector('[data-nav="subscriptions"].active')) renderSubFeed();
+    else renderHomeFeed();
+  }
+  if (state.currentPage === 'profile') renderMyVideos();
   if (state.currentPage === 'creator') renderCreatorPage();
 }
 
-/* ============================================================
-   SUBSCRIBE
-   ============================================================ */
+/* SUBSCRIBE */
 async function toggleSubscribe(channelId) {
   if (!state.user) return showAuth('signin');
   if (channelId === state.user.id) { toast("Can't subscribe to yourself", 'err'); return; }
@@ -1048,11 +1074,10 @@ async function toggleSubscribe(channelId) {
     state.currentCreator.follower_count = data.follower_count;
   }
   renderCreatorPage();
+  await loadSubFeed();
 }
 
-/* ============================================================
-   COMMENTS
-   ============================================================ */
+/* COMMENTS */
 async function loadComments(videoId) {
   const listEl = document.querySelector(`[data-comment-list="${videoId}"]`);
   if (!listEl) return;
@@ -1078,40 +1103,70 @@ async function submitComment(videoId, input) {
   if (v) v.comment_count = (v.comment_count || 0) + 1;
 }
 
-/* ============================================================
-   UPLOAD
-   ============================================================ */
+/* UPLOAD */
 $('#videoFile').addEventListener('change', (e) => {
   const f = e.target.files[0];
   $('#fileName').textContent = f ? f.name : 'No file selected';
 });
+$('#thumbFile').addEventListener('change', (e) => {
+  const f = e.target.files[0];
+  $('#thumbName').textContent = f ? f.name : 'No image selected';
+});
 
 $('#uploadBtn').addEventListener('click', async () => {
   if (!state.user) return showAuth('signin');
-  const file = $('#videoFile').files[0];
+  const videoFile = $('#videoFile').files[0];
+  const thumbFile = $('#thumbFile').files[0];
   const title = $('#uploadTitle').value.trim();
   const desc = $('#uploadDesc').value.trim();
-  if (!file) { toast('Please choose a video file', 'err'); return; }
+  
+  if (!videoFile) { toast('Please choose a video file', 'err'); return; }
   if (!title) { toast('Please enter a title', 'err'); return; }
+  
   const btn = $('#uploadBtn');
   btn.disabled = true;
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading…';
+  
   try {
-    const ext = file.name.split('.').pop();
-    const path = `${state.user.id}/${Date.now()}.${ext}`;
-    const { error: upErr } = await sb.storage.from('videos').upload(path, file, { upsert: false });
+    // 1. Upload video
+    const vidExt = videoFile.name.split('.').pop();
+    const vidPath = `${state.user.id}/${Date.now()}_vid.${vidExt}`;
+    const { error: upErr } = await sb.storage.from('videos').upload(vidPath, videoFile, { upsert: false });
     if (upErr) throw upErr;
-    const { data: urlData } = sb.storage.from('videos').getPublicUrl(path);
+    const { data: vidUrlData } = sb.storage.from('videos').getPublicUrl(vidPath);
+    
+    // 2. Upload thumbnail (if provided)
+    let thumbUrl = null;
+    if (thumbFile) {
+      const thumbExt = thumbFile.name.split('.').pop();
+      const thumbPath = `${state.user.id}/${Date.now()}_thumb.${thumbExt}`;
+      const { error: thumbErr } = await sb.storage.from('videos').upload(thumbPath, thumbFile, { upsert: false });
+      if (!thumbErr) {
+        const { data: thumbUrlData } = sb.storage.from('videos').getPublicUrl(thumbPath);
+        thumbUrl = thumbUrlData.publicUrl;
+      }
+    }
+
+    // 3. Insert to DB
     const { error: dbErr } = await sb.from('videos').insert({
-      user_id: state.user.id, title, description: desc || null,
-      video_url: urlData.publicUrl, visibility: 'public'
+      user_id: state.user.id, 
+      title, 
+      description: desc || null,
+      video_url: vidUrlData.publicUrl, 
+      thumbnail_url: thumbUrl,
+      visibility: 'public'
     });
     if (dbErr) throw dbErr;
+    
     toast('Video uploaded!');
-    $('#videoFile').value = ''; $('#uploadTitle').value = ''; $('#uploadDesc').value = '';
+    $('#videoFile').value = ''; $('#thumbFile').value = '';
+    $('#uploadTitle').value = ''; $('#uploadDesc').value = '';
     $('#fileName').textContent = 'No file selected';
+    $('#thumbName').textContent = 'No image selected';
+    
     await loadMyVideos();
     await loadHomeFeed();
+    await loadSubFeed();
   } catch (err) {
     console.error(err); toast(err.message || 'Upload failed', 'err');
   } finally {
@@ -1119,9 +1174,7 @@ $('#uploadBtn').addEventListener('click', async () => {
   }
 });
 
-/* ============================================================
-   PLAYER
-   ============================================================ */
+/* PLAYER */
 const playerModal = $('#playerModal'), playerVideo = $('#playerVideo');
 const playerTitle = $('#playerTitle'), playerMeta = $('#playerMeta');
 const playerActions = $('#playerActions'), playerComments = $('#playerComments');
@@ -1130,7 +1183,7 @@ const playerCreator = $('#playerCreator'), playerCreatorAvatar = $('#playerCreat
 let currentPlayerId = null;
 
 async function openPlayer(videoId) {
-  const v = [...state.homeVideos, ...state.myVideos, ...state.creatorVideos].find(x => x.id === videoId);
+  const v = [...state.homeVideos, ...state.myVideos, ...state.subVideos, ...state.creatorVideos].find(x => x.id === videoId);
   if (!v) return;
   currentPlayerId = videoId;
 
@@ -1139,7 +1192,6 @@ async function openPlayer(videoId) {
   playerVideo.src = v.video_url;
   playerVideo.load();
 
-  // creator in overlay
   const creator = v.profiles;
   if (creator) {
     playerCreatorName.textContent = creator.full_name || creator.username;
@@ -1196,24 +1248,26 @@ playerCommentInput.addEventListener('keydown', async (e) => {
 });
 $('#playerCommentSend').onclick = () => playerCommentInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
 
-/* ============================================================
-   SIDEBAR NAV
-   ============================================================ */
+/* SIDEBAR NAV */
 $$('.side-item').forEach(item => {
   item.onclick = () => {
     const nav = item.dataset.nav;
     if (!state.user) { showAuth('signin'); return; }
-    if (nav === 'home') goTo('home');
-    else if (nav === 'profile' || nav === 'myvideos') goTo('profile');
-    else if (nav === 'liked') { goTo('profile'); /* could filter */ }
-    else if (nav === 'about') toast('FreeTime · share your moments');
-    else { toast('Coming soon', 'ok'); }
+    
+    if (nav === 'home') { state.search = ''; $('#searchInput').value = ''; goTo('home'); }
+    else if (nav === 'subscriptions') { 
+      state.search = ''; $('#searchInput').value = ''; 
+      goTo('home'); 
+      $$('.side-item').forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+      renderSubFeed();
+    }
+    else if (nav === 'profile' || nav === 'myvideos') { goTo('profile'); }
+    else if (nav === 'about') { toast('FreeTime · share your moments'); }
   };
 });
 
-/* ============================================================
-   SEARCH
-   ============================================================ */
+/* SEARCH */
 $('#searchBtn').onclick = () => {
   state.search = $('#searchInput').value.trim();
   if (!state.user) return showAuth('signin');
@@ -1221,17 +1275,15 @@ $('#searchBtn').onclick = () => {
 };
 $('#searchInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('#searchBtn').click(); });
 
-/* ============================================================
-   REALTIME
-   ============================================================ */
+/* REALTIME */
 function startRealtime() {
   if (window._realtimeChannel) sb.removeChannel(window._realtimeChannel);
 
   window._realtimeChannel = sb.channel('freetime-realtime')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'videos' }, async (payload) => {
-      // refresh feeds on any video change
       await loadHomeFeed();
       await loadMyVideos();
+      await loadSubFeed();
       if (state.currentCreator) {
         const { data } = await sb.from('videos').select('*')
           .eq('user_id', state.currentCreator.id).eq('visibility', 'public')
@@ -1253,11 +1305,14 @@ function startRealtime() {
       if (!vid) return;
       const { data } = await sb.from('videos').select('*').eq('id', vid).maybeSingle();
       if (data) {
-        ['homeVideos', 'myVideos', 'creatorVideos'].forEach(k => {
+        ['homeVideos', 'myVideos', 'subVideos', 'creatorVideos'].forEach(k => {
           const idx = state[k].findIndex(v => v.id === vid);
           if (idx > -1) state[k][idx] = data;
         });
-        if (state.currentPage === 'home') renderHomeFeed();
+        if (state.currentPage === 'home') {
+          if (document.querySelector('[data-nav="subscriptions"].active')) renderSubFeed();
+          else renderHomeFeed();
+        }
         if (state.currentPage === 'profile') renderMyVideos();
         if (state.currentPage === 'creator') renderCreatorPage();
       }
@@ -1272,9 +1327,7 @@ function startRealtime() {
     .subscribe();
 }
 
-/* ============================================================
-   BOOT
-   ============================================================ */
+/* BOOT */
 (async () => {
   const { data: { session } } = await sb.auth.getSession();
   if (session?.user) {
